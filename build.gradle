@@ -40,6 +40,9 @@ dependencies {
     // H2 Database
     runtimeOnly "com.h2database:h2:${h2Version}"
 
+    // Jackson (JSON serialization)
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+
     // Servlet API (provided by Tomcat)
     providedCompile "jakarta.servlet:jakarta.servlet-api:${servletApiVersion}"
 
