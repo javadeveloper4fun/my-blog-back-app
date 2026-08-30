@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostResponse;
+import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Post;
 
 import java.sql.PreparedStatement;
@@ -82,7 +83,11 @@ public class PostDaoImpl implements PostDao {
     @Override
     public Post findById(long id) {
         String sql = "SELECT * FROM posts WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, postRowMapper, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, postRowMapper, id);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            throw new NotFoundException("Пост с id=" + id + " не найден");
+        }
     }
 
     @Override
@@ -131,7 +136,11 @@ public class PostDaoImpl implements PostDao {
     @Override
     public byte[] getImage(long id) {
         String sql = "SELECT image FROM posts WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, byte[].class, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, byte[].class, id);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            throw new NotFoundException("Картинка поста с id=" + id + " не найдена");
+        }
     }
 
     private String buildSearchClause(String search) {
