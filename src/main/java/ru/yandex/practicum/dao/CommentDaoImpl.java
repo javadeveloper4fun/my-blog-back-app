@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Comment;
 
 import java.sql.PreparedStatement;
@@ -41,7 +42,11 @@ public class CommentDaoImpl implements CommentDao {
     @Override
     public Comment findById(long postId, long commentId) {
         String sql = "SELECT * FROM comments WHERE post_id = ? AND id = ?";
-        return jdbcTemplate.queryForObject(sql, commentRowMapper, postId, commentId);
+        try {
+            return jdbcTemplate.queryForObject(sql, commentRowMapper, postId, commentId);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            throw new NotFoundException("Комментарий с id=" + commentId + " к посту id=" + postId + " не найден");
+        }
     }
 
     @Override
