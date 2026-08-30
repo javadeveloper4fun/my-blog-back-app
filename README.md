@@ -3,6 +3,10 @@
 Бэкенд приложения-блога на Java 21 и Spring Framework.
 Собирается в WAR и разворачивается в сервлет-контейнере Tomcat 10.1+.
 
+## Запуск
+- Фронтенд: http://localhost:80
+- Бэкенд: http://localhost:8080/api/posts
+
 ## Технологии
 - Java 21
 - Gradle (wrapper)
