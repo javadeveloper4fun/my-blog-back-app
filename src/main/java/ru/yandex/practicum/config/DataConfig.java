@@ -14,6 +14,9 @@ import javax.sql.DataSource;
 /**
  * Конфигурация подключения к базе данных H2.
  * Настраивает DataSource, JdbcTemplate и автоматическое выполнение schema.sql при старте.
+ *
+ * Реализация п. 14 (Java-конфигурация для интеграции с СУБД).
+ * П. 11 (структура БД — скрипт schema.sql выполняется при старте).
  */
 @Configuration
 public class DataConfig {

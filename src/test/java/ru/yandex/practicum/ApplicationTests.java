@@ -3,11 +3,15 @@ package ru.yandex.practicum;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.config.DataConfig;
 import ru.yandex.practicum.dao.CommentDaoImpl;
 import ru.yandex.practicum.dao.PostDaoImpl;
+import ru.yandex.practicum.dto.CommentResponse;
+import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.dto.CreatePostRequest;
 import ru.yandex.practicum.dto.PostResponse;
+import ru.yandex.practicum.dto.UpdateCommentRequest;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.service.CommentServiceImpl;
 import ru.yandex.practicum.service.PostServiceImpl;
@@ -16,8 +20,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Интеграционные тесты сервисов и DAO.
+ * Проверяют корректность работы бизнес-логики с реальной БД H2.
+ *
+ * Реализация п. 16 (тесты на слой сервисов с Spring Test Framework)
+ * и п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
+ */
 @SpringJUnitConfig(classes = {DataConfig.class, PostServiceImpl.class,
-        CommentServiceImpl.class, PostDaoImpl.class, CommentDaoImpl.class})
+        CommentServiceImpl.class, PostDaoImpl.class, CommentDaoImpl.class, IntegrationTestConfig.class})
+@Transactional
 class ApplicationTests {
 
     @Autowired
@@ -76,5 +88,39 @@ class ApplicationTests {
 
         long newCount = postService.addLike(created.getId());
         assertEquals(1L, newCount);
+    }
+
+    @Test
+    void commentCrudTest() {
+        CreatePostRequest postRequest = new CreatePostRequest();
+        postRequest.setTitle("Пост для комментариев");
+        postRequest.setText("Текст");
+        postRequest.setTags(List.of());
+        long postId = postService.createPost(postRequest).getId();
+
+        CreateCommentRequest request = new CreateCommentRequest();
+        request.setText("Первый комментарий");
+        request.setPostId(postId);
+
+        CommentResponse created = commentService.createComment(postId, request);
+        assertNotNull(created.getId());
+        assertEquals("Первый комментарий", created.getText());
+        assertEquals(postId, created.getPostId());
+
+        CommentResponse found = commentService.getComment(postId, created.getId());
+        assertEquals("Первый комментарий", found.getText());
+
+        assertEquals(1, commentService.getCommentsByPostId(postId).size());
+
+        UpdateCommentRequest updateRequest = new UpdateCommentRequest();
+        updateRequest.setId(created.getId());
+        updateRequest.setText("Отредактированный комментарий");
+        updateRequest.setPostId(postId);
+
+        CommentResponse updated = commentService.updateComment(postId, created.getId(), updateRequest);
+        assertEquals("Отредактированный комментарий", updated.getText());
+
+        commentService.deleteComment(postId, created.getId());
+        assertEquals(0, commentService.getCommentsByPostId(postId).size());
     }
 }

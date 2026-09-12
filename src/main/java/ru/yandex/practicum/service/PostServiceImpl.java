@@ -14,7 +14,10 @@ import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса постов.
- * Содержит бизнес-логику: конвертация DTO ↔ модель, обработка ошибок.
+ * Содержит бизнес-логику: конвертация DTO <-> модель, обработка ошибок.
+ *
+ * Реализация п. 9 (проектирование слоёв: Service) и п. 15 (написание сервисов).
+ * Улучшение: бизнес-логика конвертации тегов (String <-> List) вынесена в сервис.
  */
 @Service
 public class PostServiceImpl implements PostService {
@@ -84,7 +87,7 @@ public class PostServiceImpl implements PostService {
         response.setText(post.getText());
         response.setTags(convertStringToTags(post.getTags()));
         response.setLikesCount(post.getLikesCount());
-        response.setCommentsCount(0L);
+        response.setCommentsCount(post.getCommentsCount() != null ? post.getCommentsCount() : 0L);
         return response;
     }
 

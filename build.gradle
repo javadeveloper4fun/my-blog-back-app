@@ -62,6 +62,7 @@ dependencies {
     testImplementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     testImplementation "com.h2database:h2:${h2Version}"
     testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'com.jayway.jsonpath:json-path:2.9.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

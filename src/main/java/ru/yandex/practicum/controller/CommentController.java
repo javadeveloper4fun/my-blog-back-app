@@ -10,7 +10,15 @@ import java.util.List;
 
 /**
  * REST-контроллер для управления комментариями к постам.
- * Все эндпоинты начинаются с /api/posts/{id}/comments.
+ * Все эндпоинты начинаются с /api/posts/{postId}/comments.
+ *
+ * Реализация п. 9 (проектирование слоёв: Controller) и п. 15 (написание контроллеров).
+ * Эндпоинты соответствуют ТЗ бэкенда:
+ * - GET    /api/posts/{postId}/comments                — получение всех комментариев к посту
+ * - GET    /api/posts/{postId}/comments/{commentId}    — получение комментария
+ * - POST   /api/posts/{postId}/comments                — добавление комментария
+ * - PUT    /api/posts/{postId}/comments/{commentId}    — редактирование комментария
+ * - DELETE /api/posts/{postId}/comments/{commentId}    — удаление комментария
  */
 @RestController
 @RequestMapping("/api/posts/{postId}/comments")
@@ -22,25 +30,37 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    /** Получить все комментарии к посту */
+    /**
+     * Получить все комментарии к посту.
+     * ТЗ: GET /api/posts/{id}/comments — возвращает JSON-массив.
+     */
     @GetMapping
     public List<CommentResponse> getCommentsByPostId(@PathVariable long postId) {
         return commentService.getCommentsByPostId(postId);
     }
 
-    /** Получить комментарий по идентификаторам поста и комментария */
+    /**
+     * Получить комментарий по идентификаторам поста и комментария.
+     * ТЗ: GET /api/posts/{id}/comments/{commentId}
+     */
     @GetMapping("/{commentId}")
     public CommentResponse getComment(@PathVariable long postId, @PathVariable long commentId) {
         return commentService.getComment(postId, commentId);
     }
 
-    /** Создать новый комментарий к посту */
+    /**
+     * Создать новый комментарий к посту.
+     * ТЗ: POST /api/posts/{id}/comments — фронт присылает text и postId.
+     */
     @PostMapping
     public CommentResponse createComment(@PathVariable long postId, @RequestBody CreateCommentRequest request) {
         return commentService.createComment(postId, request);
     }
 
-    /** Обновить существующий комментарий */
+    /**
+     * Редактировать комментарий.
+     * ТЗ: PUT /api/posts/{id}/comments/{commentId}
+     */
     @PutMapping("/{commentId}")
     public CommentResponse updateComment(
             @PathVariable long postId,
@@ -49,7 +69,10 @@ public class CommentController {
         return commentService.updateComment(postId, commentId, request);
     }
 
-    /** Удалить комментарий по идентификаторам поста и комментария */
+    /**
+     * Удалить комментарий.
+     * ТЗ: DELETE /api/posts/{id}/comments/{commentId} — возвращает 200 OK.
+     */
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable long postId, @PathVariable long commentId) {
         commentService.deleteComment(postId, commentId);

@@ -23,6 +23,12 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Unit-тесты PostController с использованием MockMvc (standalone).
+ * Проверяют REST-эндпоинты постов с мокированием PostService.
+ *
+ * Реализация п. 17 (интеграционные тесты на MVC с WebMvc).
+ */
 @ExtendWith(MockitoExtension.class)
 class PostControllerTest {
 

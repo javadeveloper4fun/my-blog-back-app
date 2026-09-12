@@ -1,4 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Конфигурация сервлет-контейнера Tomcat.
+    Реализация п. 12 (инфраструктура для создания war-файла).
+    П. 13 (интеграция Spring-приложения с сервлет-контейнером):
+    - ContextLoaderListener поднимает корневой контекст Spring (DataConfig)
+    - DispatcherServlet обрабатывает REST-запросы (WebConfig)
+-->
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
@@ -32,6 +38,10 @@
             <param-value>ru.yandex.practicum.config.WebConfig</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
+        <multipart-config>
+            <max-file-size>10485760</max-file-size>
+            <max-request-size>10485760</max-request-size>
+        </multipart-config>
     </servlet>
 
     <servlet-mapping>

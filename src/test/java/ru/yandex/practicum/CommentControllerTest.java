@@ -22,6 +22,12 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Unit-тесты CommentController с использованием MockMvc (standalone).
+ * Проверяют REST-эндпоинты комментариев с мокированием CommentService.
+ *
+ * Реализация п. 17 (интеграционные тесты на MVC с WebMvc).
+ */
 @ExtendWith(MockitoExtension.class)
 class CommentControllerTest {
 

@@ -14,11 +14,13 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JDBC-реализация DAO для постов.
  * Все запросы к таблице posts выполняются через JdbcTemplate.
+ *
+ * Реализация п. 9 (проектирование слоёв: DAO) и п. 15 (написание DAO).
+ * П. 14 (интеграция Spring с СУБД через JdbcTemplate).
  */
 @Repository
 public class PostDaoImpl implements PostDao {
@@ -37,6 +39,7 @@ public class PostDaoImpl implements PostDao {
         post.setTags(rs.getString("tags"));
         post.setLikesCount(rs.getLong("likes_count"));
         post.setImage(rs.getBytes("image"));
+        post.setCommentsCount(rs.getLong("comments_count"));
         return post;
     };
 
@@ -71,6 +74,11 @@ public class PostDaoImpl implements PostDao {
         Object[] params = buildQueryParams(search, pageSize, (pageNumber - 1) * pageSize);
 
         List<PostResponse> posts = jdbcTemplate.query(sql, postResponseRowMapper, params);
+        posts.forEach(p -> {
+            if (p.getText() != null && p.getText().length() > 128) {
+                p.setText(p.getText().substring(0, 128) + "…");
+            }
+        });
 
         PostListResponse response = new PostListResponse();
         response.setPosts(posts);
@@ -82,7 +90,9 @@ public class PostDaoImpl implements PostDao {
 
     @Override
     public Post findById(long id) {
-        String sql = "SELECT * FROM posts WHERE id = ?";
+        String sql = "SELECT p.*, " +
+                "(SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count " +
+                "FROM posts p WHERE p.id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, postRowMapper, id);
         } catch (org.springframework.dao.EmptyResultDataAccessException e) {
@@ -147,32 +157,49 @@ public class PostDaoImpl implements PostDao {
         if (search == null || search.trim().isEmpty()) {
             return "";
         }
-        StringBuilder where = new StringBuilder(" WHERE ");
-        List<String> conditions = Arrays.stream(search.split("\\s+"))
+        List<String> words = Arrays.stream(search.split("\\s+"))
                 .filter(w -> !w.isEmpty())
-                .map(word -> {
-                    if (word.startsWith("#")) {
-                        return "tags LIKE ?";
-                    } else {
-                        return "title LIKE ?";
-                    }
-                })
-                .collect(Collectors.toList());
+                .toList();
+        List<String> conditions = new java.util.ArrayList<>();
+        List<String> tagWords = new java.util.ArrayList<>();
+        List<String> titleWords = new java.util.ArrayList<>();
+        for (String w : words) {
+            if (w.startsWith("#")) {
+                tagWords.add(w);
+            } else {
+                titleWords.add(w);
+            }
+        }
+        tagWords.forEach(w -> conditions.add("tags LIKE ?"));
+        if (!titleWords.isEmpty()) {
+            conditions.add("title LIKE ?");
+        }
         if (conditions.isEmpty()) {
             return "";
         }
-        where.append(String.join(" AND ", conditions));
-        return where.toString();
+        return " WHERE " + String.join(" AND ", conditions);
     }
 
     private Object[] getSearchParams(String search) {
         if (search == null || search.trim().isEmpty()) {
             return new Object[]{};
         }
-        return Arrays.stream(search.split("\\s+"))
+        List<String> words = Arrays.stream(search.split("\\s+"))
                 .filter(w -> !w.isEmpty())
-                .map(word -> "%" + word.substring(word.startsWith("#") ? 1 : 0) + "%")
-                .toArray();
+                .toList();
+        List<Object> params = new java.util.ArrayList<>();
+        for (String w : words) {
+            if (w.startsWith("#")) {
+                params.add("%" + w.substring(1) + "%");
+            }
+        }
+        List<String> titleWords = words.stream()
+                .filter(w -> !w.isEmpty() && !w.startsWith("#"))
+                .toList();
+        if (!titleWords.isEmpty()) {
+            params.add("%" + String.join(" ", titleWords) + "%");
+        }
+        return params.toArray();
     }
 
     private Object[] buildQueryParams(String search, int limit, int offset) {

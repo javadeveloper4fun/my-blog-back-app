@@ -5,6 +5,9 @@ import lombok.Data;
 /**
  * Сущность поста блога.
  * Сохраняется в таблице posts базы данных H2.
+ *
+ * Реализация п. 9 (проектирование слоёв: Model) и п. 10 (проектирование классов по SOLID/YAGNI).
+ * П. 11 (структура БД: таблица posts).
  */
 @Data
 public class Post {
@@ -20,4 +23,6 @@ public class Post {
     private Long likesCount;
     /** Картинка поста в виде массива байтов */
     private byte[] image;
+    /** Количество комментариев (заполняется через подзапрос в DAO) */
+    private Long commentsCount;
 }
