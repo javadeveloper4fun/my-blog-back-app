@@ -1,14 +1,13 @@
 package ru.yandex.practicum.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dao.CommentDao;
 import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.dto.UpdateCommentRequest;
 import ru.yandex.practicum.model.Comment;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса комментариев.
@@ -28,9 +27,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponse> getCommentsByPostId(long postId) {
         List<Comment> comments = commentDao.findByPostId(postId);
-        return comments.stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        return comments.stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override

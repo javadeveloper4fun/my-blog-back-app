@@ -1,5 +1,8 @@
 package ru.yandex.practicum.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -7,10 +10,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Comment;
-
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.List;
 
 /**
  * JDBC-реализация DAO для комментариев.
@@ -53,12 +52,14 @@ public class CommentDaoImpl implements CommentDao {
     public Comment save(Comment comment) {
         String sql = "INSERT INTO comments (text, post_id) VALUES (?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, comment.getText());
-            ps.setLong(2, comment.getPostId());
-            return ps;
-        }, keyHolder);
+        jdbcTemplate.update(
+                connection -> {
+                    PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setString(1, comment.getText());
+                    ps.setLong(2, comment.getPostId());
+                    return ps;
+                },
+                keyHolder);
         comment.setId(keyHolder.getKey().longValue());
         return comment;
     }

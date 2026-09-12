@@ -1,5 +1,9 @@
 package ru.yandex.practicum.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -9,11 +13,6 @@ import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Post;
-
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * JDBC-реализация DAO для постов.
@@ -67,10 +66,9 @@ public class PostDaoImpl implements PostDao {
         int lastPage = (int) Math.ceil((double) totalPosts / pageSize);
         if (lastPage == 0) lastPage = 1;
 
-        String sql = "SELECT p.*, " +
-                "(SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count " +
-                "FROM posts p" + whereClause +
-                " ORDER BY p.id DESC LIMIT ? OFFSET ?";
+        String sql = "SELECT p.*, " + "(SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count "
+                + "FROM posts p"
+                + whereClause + " ORDER BY p.id DESC LIMIT ? OFFSET ?";
         Object[] params = buildQueryParams(search, pageSize, (pageNumber - 1) * pageSize);
 
         List<PostResponse> posts = jdbcTemplate.query(sql, postResponseRowMapper, params);
@@ -90,9 +88,8 @@ public class PostDaoImpl implements PostDao {
 
     @Override
     public Post findById(long id) {
-        String sql = "SELECT p.*, " +
-                "(SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count " +
-                "FROM posts p WHERE p.id = ?";
+        String sql = "SELECT p.*, " + "(SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count "
+                + "FROM posts p WHERE p.id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, postRowMapper, id);
         } catch (org.springframework.dao.EmptyResultDataAccessException e) {
@@ -104,14 +101,16 @@ public class PostDaoImpl implements PostDao {
     public Post save(Post post) {
         String sql = "INSERT INTO posts (title, text, tags, likes_count) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, post.getTitle());
-            ps.setString(2, post.getText());
-            ps.setString(3, post.getTags());
-            ps.setLong(4, post.getLikesCount() != null ? post.getLikesCount() : 0);
-            return ps;
-        }, keyHolder);
+        jdbcTemplate.update(
+                connection -> {
+                    PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setString(1, post.getTitle());
+                    ps.setString(2, post.getText());
+                    ps.setString(3, post.getTags());
+                    ps.setLong(4, post.getLikesCount() != null ? post.getLikesCount() : 0);
+                    return ps;
+                },
+                keyHolder);
         post.setId(keyHolder.getKey().longValue());
         return post;
     }
@@ -157,9 +156,8 @@ public class PostDaoImpl implements PostDao {
         if (search == null || search.trim().isEmpty()) {
             return "";
         }
-        List<String> words = Arrays.stream(search.split("\\s+"))
-                .filter(w -> !w.isEmpty())
-                .toList();
+        List<String> words =
+                Arrays.stream(search.split("\\s+")).filter(w -> !w.isEmpty()).toList();
         List<String> conditions = new java.util.ArrayList<>();
         List<String> tagWords = new java.util.ArrayList<>();
         List<String> titleWords = new java.util.ArrayList<>();
@@ -182,20 +180,18 @@ public class PostDaoImpl implements PostDao {
 
     private Object[] getSearchParams(String search) {
         if (search == null || search.trim().isEmpty()) {
-            return new Object[]{};
+            return new Object[] {};
         }
-        List<String> words = Arrays.stream(search.split("\\s+"))
-                .filter(w -> !w.isEmpty())
-                .toList();
+        List<String> words =
+                Arrays.stream(search.split("\\s+")).filter(w -> !w.isEmpty()).toList();
         List<Object> params = new java.util.ArrayList<>();
         for (String w : words) {
             if (w.startsWith("#")) {
                 params.add("%" + w.substring(1) + "%");
             }
         }
-        List<String> titleWords = words.stream()
-                .filter(w -> !w.isEmpty() && !w.startsWith("#"))
-                .toList();
+        List<String> titleWords =
+                words.stream().filter(w -> !w.isEmpty() && !w.startsWith("#")).toList();
         if (!titleWords.isEmpty()) {
             params.add("%" + String.join(" ", titleWords) + "%");
         }

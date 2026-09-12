@@ -1,7 +1,7 @@
 package ru.yandex.practicum.dto;
 
-import lombok.Data;
 import java.util.List;
+import lombok.Data;
 
 /**
  * Ответ со списком постов для главной страницы (ленты).

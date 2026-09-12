@@ -1,5 +1,8 @@
 package ru.yandex.practicum;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -16,10 +19,6 @@ import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.service.CommentServiceImpl;
 import ru.yandex.practicum.service.PostServiceImpl;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * Интеграционные тесты сервисов и DAO.
  * Проверяют корректность работы бизнес-логики с реальной БД H2.
@@ -27,8 +26,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * Реализация п. 16 (тесты на слой сервисов с Spring Test Framework)
  * и п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
  */
-@SpringJUnitConfig(classes = {DataConfig.class, PostServiceImpl.class,
-        CommentServiceImpl.class, PostDaoImpl.class, CommentDaoImpl.class, IntegrationTestConfig.class})
+@SpringJUnitConfig(
+        classes = {
+            DataConfig.class,
+            PostServiceImpl.class,
+            CommentServiceImpl.class,
+            PostDaoImpl.class,
+            CommentDaoImpl.class,
+            IntegrationTestConfig.class
+        })
 @Transactional
 class ApplicationTests {
 
@@ -72,8 +78,7 @@ class ApplicationTests {
 
         postService.deletePost(id);
 
-        assertThrows(NotFoundException.class,
-                () -> postService.getPost(id));
+        assertThrows(NotFoundException.class, () -> postService.getPost(id));
     }
 
     @Test

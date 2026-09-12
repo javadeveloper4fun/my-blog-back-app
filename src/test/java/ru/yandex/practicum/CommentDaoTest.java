@@ -1,5 +1,8 @@
 package ru.yandex.practicum;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -13,17 +16,12 @@ import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Comment;
 import ru.yandex.practicum.model.Post;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * Интеграционные тесты слоя DAO комментариев с реальной БД H2.
  *
  * Реализация п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
  */
-@SpringJUnitConfig(classes = {DataConfig.class, PostDaoImpl.class, CommentDaoImpl.class,
-        IntegrationTestConfig.class})
+@SpringJUnitConfig(classes = {DataConfig.class, PostDaoImpl.class, CommentDaoImpl.class, IntegrationTestConfig.class})
 @Transactional
 class CommentDaoTest {
 

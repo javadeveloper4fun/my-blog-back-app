@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -15,16 +17,13 @@ import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Comment;
 import ru.yandex.practicum.model.Post;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * Интеграционные тесты слоя DAO постов с реальной БД H2.
  * Проверяют корректность SQL-запросов, поиска, пагинации и подсчёта комментариев.
  *
  * Реализация п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
  */
-@SpringJUnitConfig(classes = {DataConfig.class, PostDaoImpl.class, CommentDaoImpl.class,
-        IntegrationTestConfig.class})
+@SpringJUnitConfig(classes = {DataConfig.class, PostDaoImpl.class, CommentDaoImpl.class, IntegrationTestConfig.class})
 @Transactional
 class PostDaoTest {
 
@@ -204,7 +203,7 @@ class PostDaoTest {
     @Test
     void updateImageAndGetImageTest() {
         long id = createPost("Пост с картинкой", "Текст", "");
-        byte[] image = new byte[]{1, 2, 3, 4};
+        byte[] image = new byte[] {1, 2, 3, 4};
 
         postDao.updateImage(id, image);
 

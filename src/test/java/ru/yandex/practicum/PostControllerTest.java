@@ -1,6 +1,13 @@
 package ru.yandex.practicum;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,14 +21,6 @@ import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.ExceptionController;
 import ru.yandex.practicum.service.PostService;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Unit-тесты PostController с использованием MockMvc (standalone).
@@ -123,7 +122,6 @@ class PostControllerTest {
 
     @Test
     void deletePostTest() throws Exception {
-        mockMvc.perform(delete("/api/posts/1"))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/posts/1")).andExpect(status().isOk());
     }
 }

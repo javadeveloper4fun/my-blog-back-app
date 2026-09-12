@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'war'
+    id 'com.diffplug.spotless' version '8.10.2'
+    id 'checkstyle'
 }
 
 group = 'ru.yandex.practicum'
@@ -72,4 +74,18 @@ war {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        palantirJavaFormat('2.98.0')
+        removeUnusedImports()
+    }
+}
+
+checkstyle {
+    toolVersion = '10.12.5'
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+    ignoreFailures = false
 }

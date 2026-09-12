@@ -1,5 +1,7 @@
 package ru.yandex.practicum.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dao.PostDao;
 import ru.yandex.practicum.dto.CreatePostRequest;
@@ -7,10 +9,6 @@ import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.dto.UpdatePostRequest;
 import ru.yandex.practicum.model.Post;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса постов.

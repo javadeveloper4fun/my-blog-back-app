@@ -1,8 +1,7 @@
 package ru.yandex.practicum.dao;
 
-import ru.yandex.practicum.model.Comment;
-
 import java.util.List;
+import ru.yandex.practicum.model.Comment;
 
 /**
  * Интерфейс доступа к данным комментариев.

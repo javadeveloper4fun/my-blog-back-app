@@ -1,6 +1,13 @@
 package ru.yandex.practicum;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,14 +20,6 @@ import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.exception.ExceptionController;
 import ru.yandex.practicum.service.CommentService;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Unit-тесты CommentController с использованием MockMvc (standalone).
@@ -75,7 +74,8 @@ class CommentControllerTest {
         created.setText("new-comment");
         created.setPostId(1L);
 
-        when(commentService.createComment(eq(1L), any(CreateCommentRequest.class))).thenReturn(created);
+        when(commentService.createComment(eq(1L), any(CreateCommentRequest.class)))
+                .thenReturn(created);
 
         String body = mockMvc.perform(post("/api/posts/1/comments")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +91,6 @@ class CommentControllerTest {
 
     @Test
     void deleteCommentTest() throws Exception {
-        mockMvc.perform(delete("/api/posts/1/comments/1"))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/posts/1/comments/1")).andExpect(status().isOk());
     }
 }

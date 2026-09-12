@@ -1,5 +1,9 @@
 package ru.yandex.practicum;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.config.DataConfig;
 import ru.yandex.practicum.config.WebConfig;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.*;
 
 /**
  * Интеграционные тесты MVC с полным контекстом Spring (WebConfig + DataConfig)
@@ -57,7 +57,9 @@ class MvcIntegrationTest {
     void searchAndPaginationTest() throws Exception {
         String request = """
                 {"title":"Погода в Москве","text":"Текст","tags":["weather"]}""";
-        mockMvc.perform(post("/api/posts").contentType(MediaType.APPLICATION_JSON).content(request))
+        mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
                 .andExpect(status().isOk());
 
         mockMvc.perform(post("/api/posts")
@@ -84,7 +86,9 @@ class MvcIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         long id = extractId(body);
 
@@ -102,7 +106,9 @@ class MvcIntegrationTest {
         String body = mockMvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         long id = extractId(body);
 
         mockMvc.perform(post("/api/posts/" + id + "/comments")
@@ -120,7 +126,8 @@ class MvcIntegrationTest {
                         .param("pageSize", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.posts[?(@.id==" + id + ")]").exists())
-                .andExpect(jsonPath("$.posts[?(@.id==" + id + ")].commentsCount").value(2));
+                .andExpect(
+                        jsonPath("$.posts[?(@.id==" + id + ")].commentsCount").value(2));
     }
 
     @Test
@@ -130,7 +137,9 @@ class MvcIntegrationTest {
         String body = mockMvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         long id = extractId(body);
 
         mockMvc.perform(post("/api/posts/" + id + "/comments")
@@ -139,11 +148,9 @@ class MvcIntegrationTest {
                 .andExpect(status().isOk());
         mockMvc.perform(post("/api/posts/" + id + "/likes")).andExpect(status().isOk());
 
-        mockMvc.perform(delete("/api/posts/" + id))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/posts/" + id)).andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/posts/" + id))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(post("/api/posts/" + id)).andExpect(status().isNotFound());
         mockMvc.perform(get("/api/posts/" + id + "/comments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());

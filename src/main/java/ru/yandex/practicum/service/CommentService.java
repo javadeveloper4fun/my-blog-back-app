@@ -1,10 +1,9 @@
 package ru.yandex.practicum.service;
 
+import java.util.List;
 import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.dto.UpdateCommentRequest;
-
-import java.util.List;
 
 /**
  * Интерфейс сервиса комментариев.

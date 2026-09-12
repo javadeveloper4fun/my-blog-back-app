@@ -3,8 +3,6 @@ package ru.yandex.practicum.dao;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.model.Post;
 
-import java.util.List;
-
 /**
  * Интерфейс доступа к данным постов.
  * Определяет CRUD-операции для постов блога.

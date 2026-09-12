@@ -1,9 +1,9 @@
 package ru.yandex.practicum;
 
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import javax.sql.DataSource;
 
 /**
  * Тестовая конфигурация: транзакционный менеджер для изоляции интеграционных тестов.
