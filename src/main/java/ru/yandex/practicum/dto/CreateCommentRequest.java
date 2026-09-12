@@ -4,8 +4,8 @@ import lombok.Data;
 
 /**
  * Запрос на создание нового комментария к посту.
- * Используется при POST /api/posts/{id}/comments.
- * Фронтенд отправляет JSON с текстом и id поста.
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (JSON через Jackson).
+ * Постановка: POST /api/posts/{id}/comments — в теле JSON текст и id поста.
  */
 @Data
 public class CreateCommentRequest {

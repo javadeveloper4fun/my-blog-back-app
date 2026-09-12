@@ -3,9 +3,11 @@ package ru.yandex.practicum.dto;
 import lombok.Data;
 
 /**
- * Ответ с данными одного комментария.
- * Используется при получении комментария (GET /api/posts/{id}/comments/{commentId}),
- * создании (POST /api/posts/{id}/comments) и редактировании (PUT /api/posts/{id}/comments/{commentId}).
+ * Ответ с данными комментария.
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (JSON-ответы через Jackson).
+ * Используется для ответов по постановке: получение комментария
+ * (GET /api/posts/{id}/comments/{commentId}), создание (POST /api/posts/{id}/comments)
+ * и редактирование (PUT /api/posts/{id}/comments/{commentId}).
  */
 @Data
 public class CommentResponse {

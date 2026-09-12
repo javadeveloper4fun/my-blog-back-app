@@ -4,9 +4,10 @@ import java.util.List;
 import lombok.Data;
 
 /**
- * Ответ с данными одного поста.
- * Используется при получении поста (POST /api/posts/{id}),
- * создании поста (POST /api/posts) и редактировании (PUT /api/posts/{id}).
+ * Ответ с данными поста.
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (JSON через Jackson).
+ * Постановка: получение поста (POST /api/posts/{id}),
+ * создание (POST /api/posts) и редактирование (PUT /api/posts/{id}).
  */
 @Data
 public class PostResponse {

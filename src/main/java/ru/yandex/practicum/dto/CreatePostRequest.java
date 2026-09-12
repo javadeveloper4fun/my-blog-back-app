@@ -5,8 +5,8 @@ import lombok.Data;
 
 /**
  * Запрос на создание нового поста.
- * Используется при POST /api/posts.
- * Фронтенд отправляет JSON с названием, текстом и тегами.
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (JSON через Jackson).
+ * Постановка: POST /api/posts — в теле JSON название, текст Markdown и теги.
  */
 @Data
 public class CreatePostRequest {

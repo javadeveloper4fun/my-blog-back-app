@@ -4,8 +4,10 @@ import java.util.List;
 import lombok.Data;
 
 /**
- * Ответ со списком постов для главной страницы (ленты).
- * Используется при получении списка постов (GET /api/posts?search=&pageNumber=&pageSize=).
+ * Ответ со списком постов для главной страницы (лента постов).
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (JSON через Jackson).
+ * Постановка: GET /api/posts?search=&pageNumber=&pageSize= — в ответе поле posts
+ * и метаинформация пагинации (hasPrev, hasNext, lastPage).
  */
 @Data
 public class PostListResponse {

@@ -4,8 +4,9 @@ import lombok.Data;
 
 /**
  * Запрос на редактирование комментария к посту.
- * Используется при PUT /api/posts/{id}/comments/{commentId}.
- * Фронтенд отправляет JSON с id комментария, текстом и id поста.
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (JSON через Jackson).
+ * Постановка: PUT /api/posts/{id}/comments/{commentId} — в теле JSON id комментария,
+ * текст и id поста.
  */
 @Data
 public class UpdateCommentRequest {

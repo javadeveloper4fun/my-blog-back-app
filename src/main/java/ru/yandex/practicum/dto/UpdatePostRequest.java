@@ -5,8 +5,8 @@ import lombok.Data;
 
 /**
  * Запрос на редактирование поста.
- * Используется при PUT /api/posts/{id}.
- * Фронтенд отправляет JSON с id, названием, текстом и тегами.
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (JSON через Jackson).
+ * Постановка: PUT /api/posts/{id} — в теле JSON id, название, текст Markdown и теги.
  */
 @Data
 public class UpdatePostRequest {
