@@ -21,11 +21,11 @@ import ru.yandex.practicum.service.CommentService;
  * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (Spring MVC / REST).
  * Реализация п. 9 (проектирование слоёв: Controller) и п. 15 (написание контроллеров).
  * Эндпоинты соответствуют постановке бэкенда:
- * - GET    /api/posts/{postId}/comments                — получение всех комментариев к посту
- * - GET    /api/posts/{postId}/comments/{commentId}    — получение комментария
- * - POST   /api/posts/{postId}/comments                — добавление комментария
- * - PUT    /api/posts/{postId}/comments/{commentId}    — редактирование комментария
- * - DELETE /api/posts/{postId}/comments/{commentId}    — удаление комментария
+ * - GET    /api/posts/{id}/comments                — получение всех комментариев к посту
+ * - GET    /api/posts/{id}/comments/{commentId}    — получение комментария
+ * - POST   /api/posts/{id}/comments                — добавление комментария
+ * - PUT    /api/posts/{id}/comments/{commentId}    — редактирование комментария
+ * - DELETE /api/posts/{id}/comments/{commentId}    — удаление комментария
  */
 @RestController
 @RequestMapping("/api/posts/{postId}/comments")
