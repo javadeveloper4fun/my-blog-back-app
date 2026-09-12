@@ -28,6 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
      * MultipartResolver для обработки запросов multipart/form-data
      * (Постановка: PUT /api/posts/{id}/image — фронтенд отправляет файл картинки).
      * Без него DispatcherServlet не разбирает multipart-запросы → 500.
+     *
+     * @return resolver для multipart-запросов
      */
     @Bean
     public StandardServletMultipartResolver multipartResolver() {

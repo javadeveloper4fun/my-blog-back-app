@@ -7,5 +7,10 @@
             <property name="allowStaticMemberImports" value="true"/>
         </module>
         <module name="ConstantName"/>
+        <module name="JavadocType"/>
+        <module name="JavadocMethod"/>
+        <module name="JavadocVariable">
+            <property name="scope" value="public"/>
+        </module>
     </module>
 </module>

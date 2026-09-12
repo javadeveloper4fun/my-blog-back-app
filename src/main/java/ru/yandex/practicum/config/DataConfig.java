@@ -31,7 +31,11 @@ public class DataConfig {
     @Value("${spring.datasource.password:}")
     private String dbPassword;
 
-    /** DataSource для подключения к H2 in-memory БД */
+    /**
+     * DataSource для подключения к H2 in-memory БД.
+     *
+     * @return сконфигурированный DataSource
+     */
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
@@ -42,13 +46,23 @@ public class DataConfig {
         return ds;
     }
 
-    /** JdbcTemplate для выполнения SQL-запросов */
+    /**
+     * JdbcTemplate для выполнения SQL-запросов.
+     *
+     * @param dataSource источник данных для подключений
+     * @return JdbcTemplate поверх переданного DataSource
+     */
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 
-    /** Автоматическое выполнение schema.sql при старте приложения */
+    /**
+     * Автоматическое выполнение schema.sql при старте приложения.
+     *
+     * @param dataSource источник данных, к которому применяется скрипт
+     * @return инициализатор схемы БД
+     */
     @Bean
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
         DataSourceInitializer initializer = new DataSourceInitializer();

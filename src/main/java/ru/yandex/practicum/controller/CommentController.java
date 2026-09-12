@@ -40,6 +40,9 @@ public class CommentController {
     /**
      * Получить все комментарии к посту.
      * Постановка: GET /api/posts/{id}/comments — возвращает JSON-массив.
+     *
+     * @param postId идентификатор поста
+     * @return список комментариев поста
      */
     @GetMapping
     public List<CommentResponse> getCommentsByPostId(@PathVariable long postId) {
@@ -49,6 +52,10 @@ public class CommentController {
     /**
      * Получить комментарий по идентификаторам поста и комментария.
      * Постановка: GET /api/posts/{id}/comments/{commentId}
+     *
+     * @param postId    идентификатор поста
+     * @param commentId идентификатор комментария
+     * @return комментарий
      */
     @GetMapping("/{commentId}")
     public CommentResponse getComment(@PathVariable long postId, @PathVariable long commentId) {
@@ -58,6 +65,10 @@ public class CommentController {
     /**
      * Создать новый комментарий к посту.
      * Постановка: POST /api/posts/{id}/comments — фронт присылает text и postId.
+     *
+     * @param postId  идентификатор поста
+     * @param request запрос на создание комментария
+     * @return созданный комментарий
      */
     @PostMapping
     public CommentResponse createComment(@PathVariable long postId, @RequestBody CreateCommentRequest request) {
@@ -67,6 +78,11 @@ public class CommentController {
     /**
      * Редактировать комментарий.
      * Постановка: PUT /api/posts/{id}/comments/{commentId}
+     *
+     * @param postId    идентификатор поста
+     * @param commentId идентификатор комментария
+     * @param request   запрос на обновление комментария
+     * @return обновлённый комментарий
      */
     @PutMapping("/{commentId}")
     public CommentResponse updateComment(
@@ -77,6 +93,9 @@ public class CommentController {
     /**
      * Удалить комментарий.
      * Постановка: DELETE /api/posts/{id}/comments/{commentId} — возвращает 200 OK.
+     *
+     * @param postId    идентификатор поста
+     * @param commentId идентификатор комментария
      */
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable long postId, @PathVariable long commentId) {

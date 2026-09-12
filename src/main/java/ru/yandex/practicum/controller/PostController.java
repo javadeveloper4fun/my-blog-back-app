@@ -47,6 +47,11 @@ public class PostController {
      * Получить список постов с поиском и пагинацией.
      * Постановка: GET /api/posts?search=&pageNumber=1&pageSize=10
      * П. 9 (слой Controller), п. 15 (написание контроллеров).
+     *
+     * @param search     строка поиска
+     * @param pageNumber номер страницы
+     * @param pageSize   число постов на странице
+     * @return ответ со списком постов
      */
     @GetMapping
     public PostListResponse getPosts(
@@ -59,6 +64,9 @@ public class PostController {
     /**
      * Получить пост по идентификатору.
      * Постановка: POST /api/posts/{id} (POST вместо GET — особенность фронтенда).
+     *
+     * @param id идентификатор поста
+     * @return пост
      */
     @PostMapping("/{id}")
     public PostResponse getPost(@PathVariable long id) {
@@ -68,6 +76,9 @@ public class PostController {
     /**
      * Добавить новый пост.
      * Постановка: POST /api/posts — фронт присылает title, text, tags.
+     *
+     * @param request запрос на создание поста
+     * @return созданный пост
      */
     @PostMapping
     public PostResponse createPost(@RequestBody CreatePostRequest request) {
@@ -77,6 +88,10 @@ public class PostController {
     /**
      * Редактировать пост.
      * Постановка: PUT /api/posts/{id} — фронт присылает id, title, text, tags.
+     *
+     * @param id      идентификатор поста
+     * @param request запрос на обновление поста
+     * @return обновлённый пост
      */
     @PutMapping("/{id}")
     public PostResponse updatePost(@PathVariable long id, @RequestBody UpdatePostRequest request) {
@@ -86,6 +101,8 @@ public class PostController {
     /**
      * Удалить пост со всеми комментариями.
      * Постановка: DELETE /api/posts/{id} — возвращает 200 OK.
+     *
+     * @param id идентификатор поста
      */
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable long id) {
@@ -95,6 +112,9 @@ public class PostController {
     /**
      * Инкремент числа лайков поста на 1.
      * Постановка: POST /api/posts/{id}/likes — возвращает обновлённое число лайков.
+     *
+     * @param id идентификатор поста
+     * @return обновлённое количество лайков
      */
     @PostMapping("/{id}/likes")
     public long addLike(@PathVariable long id) {
@@ -105,6 +125,9 @@ public class PostController {
      * Обновить картинку поста.
      * Постановка: PUT /api/posts/{id}/image — фронтенд отправляет multipart/form-data.
      * Content-Disposition: form-data; name="image"; filename="image_name.jpg"
+     *
+     * @param id    идентификатор поста
+     * @param image загружаемый файл изображения
      */
     @PutMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateImage(@PathVariable long id, @RequestParam("image") MultipartFile image)
@@ -115,6 +138,9 @@ public class PostController {
     /**
      * Получить картинку поста.
      * Постановка: GET /api/posts/{id}/image — возвращает массив байт.
+     *
+     * @param id идентификатор поста
+     * @return байты изображения
      */
     @GetMapping(value = "/{id}/image", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getImage(@PathVariable long id) {
