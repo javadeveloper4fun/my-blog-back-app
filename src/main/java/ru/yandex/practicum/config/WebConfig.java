@@ -13,6 +13,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Включает поддержку REST-контроллеров (@EnableWebMvc),
  * сканирование компонентов в пакете ru.yandex.practicum.
  *
+ * Спринт 3: Тема 3 «Инфраструктурные бины Spring» (аннотации-конфигурации)
+ * Тема 4 «Создание бинов через Java-аннотации» (@ComponentScan)
+ * и Тема 8 «Практика по разработке Spring Framework» (@EnableWebMvc).
  * Реализация п. 13 (Java-конфигурация для интеграции с сервлет-контейнером).
  * Улучшение: добавлена настройка CORS — требуется для работы фронта на :80 с бэкендом на :8080.
  */
@@ -23,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * MultipartResolver для обработки запросов multipart/form-data
-     * (ТЗ: PUT /api/posts/{id}/image — фронтенд отправляет файл картинки).
+     * (Постановка: PUT /api/posts/{id}/image — фронтенд отправляет файл картинки).
      * Без него DispatcherServlet не разбирает multipart-запросы → 500.
      */
     @Bean

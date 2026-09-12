@@ -19,6 +19,8 @@ import ru.yandex.practicum.model.Post;
 /**
  * Интеграционные тесты слоя DAO комментариев с реальной БД H2.
  *
+ * Спринт 3: Тема 10 «TestContext Framework» (@SpringJUnitConfig + @Transactional)
+ * и Тема 11 «Практика по тестированию Spring-приложений».
  * Реализация п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
  */
 @SpringJUnitConfig(classes = {DataConfig.class, PostDaoImpl.class, CommentDaoImpl.class, IntegrationTestConfig.class})

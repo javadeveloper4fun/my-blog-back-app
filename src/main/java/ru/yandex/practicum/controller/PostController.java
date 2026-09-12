@@ -21,8 +21,9 @@ import ru.yandex.practicum.service.PostService;
  * REST-контроллер для управления постами блога.
  * Все эндпоинты начинаются с /api/posts.
  *
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (Spring MVC / REST).
  * Реализация п. 9 (проектирование слоёв: Controller) и п. 15 (написание контроллеров).
- * Эндпоинты соответствуют ТЗ бэкенда:
+ * Эндпоинты соответствуют постановке бэкенда:
  * - GET  /api/posts              — получение списка постов с поиском и пагинацией
  * - POST /api/posts/{id}         — получение поста (POST вместо GET — особенность фронтенда)
  * - POST /api/posts              — добавление поста
@@ -44,7 +45,7 @@ public class PostController {
 
     /**
      * Получить список постов с поиском и пагинацией.
-     * ТЗ: GET /api/posts?search=&pageNumber=1&pageSize=10
+     * Постановка: GET /api/posts?search=&pageNumber=1&pageSize=10
      * П. 9 (слой Controller), п. 15 (написание контроллеров).
      */
     @GetMapping
@@ -57,7 +58,7 @@ public class PostController {
 
     /**
      * Получить пост по идентификатору.
-     * ТЗ: POST /api/posts/{id} (POST вместо GET — особенность фронтенда).
+     * Постановка: POST /api/posts/{id} (POST вместо GET — особенность фронтенда).
      */
     @PostMapping("/{id}")
     public PostResponse getPost(@PathVariable long id) {
@@ -66,7 +67,7 @@ public class PostController {
 
     /**
      * Добавить новый пост.
-     * ТЗ: POST /api/posts — фронт присылает title, text, tags.
+     * Постановка: POST /api/posts — фронт присылает title, text, tags.
      */
     @PostMapping
     public PostResponse createPost(@RequestBody CreatePostRequest request) {
@@ -75,7 +76,7 @@ public class PostController {
 
     /**
      * Редактировать пост.
-     * ТЗ: PUT /api/posts/{id} — фронт присылает id, title, text, tags.
+     * Постановка: PUT /api/posts/{id} — фронт присылает id, title, text, tags.
      */
     @PutMapping("/{id}")
     public PostResponse updatePost(@PathVariable long id, @RequestBody UpdatePostRequest request) {
@@ -84,7 +85,7 @@ public class PostController {
 
     /**
      * Удалить пост со всеми комментариями.
-     * ТЗ: DELETE /api/posts/{id} — возвращает 200 OK.
+     * Постановка: DELETE /api/posts/{id} — возвращает 200 OK.
      */
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable long id) {
@@ -93,7 +94,7 @@ public class PostController {
 
     /**
      * Инкремент числа лайков поста на 1.
-     * ТЗ: POST /api/posts/{id}/likes — возвращает обновлённое число лайков.
+     * Постановка: POST /api/posts/{id}/likes — возвращает обновлённое число лайков.
      */
     @PostMapping("/{id}/likes")
     public long addLike(@PathVariable long id) {
@@ -102,7 +103,7 @@ public class PostController {
 
     /**
      * Обновить картинку поста.
-     * ТЗ: PUT /api/posts/{id}/image — фронтенд отправляет multipart/form-data.
+     * Постановка: PUT /api/posts/{id}/image — фронтенд отправляет multipart/form-data.
      * Content-Disposition: form-data; name="image"; filename="image_name.jpg"
      */
     @PutMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -113,7 +114,7 @@ public class PostController {
 
     /**
      * Получить картинку поста.
-     * ТЗ: GET /api/posts/{id}/image — возвращает массив байт.
+     * Постановка: GET /api/posts/{id}/image — возвращает массив байт.
      */
     @GetMapping(value = "/{id}/image", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getImage(@PathVariable long id) {

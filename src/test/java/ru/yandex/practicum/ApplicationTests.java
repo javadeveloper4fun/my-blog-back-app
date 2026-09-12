@@ -23,6 +23,8 @@ import ru.yandex.practicum.service.PostServiceImpl;
  * Интеграционные тесты сервисов и DAO.
  * Проверяют корректность работы бизнес-логики с реальной БД H2.
  *
+ * Спринт 3: Тема 10 «TestContext Framework» (@SpringJUnitConfig + @Transactional)
+ * и Тема 11 «Практика по тестированию Spring-приложений».
  * Реализация п. 16 (тесты на слой сервисов с Spring Test Framework)
  * и п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
  */

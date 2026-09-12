@@ -18,8 +18,9 @@ import ru.yandex.practicum.service.CommentService;
  * REST-контроллер для управления комментариями к постам.
  * Все эндпоинты начинаются с /api/posts/{postId}/comments.
  *
+ * Спринт 3: Тема 8 «Практика по разработке Spring Framework» (Spring MVC / REST).
  * Реализация п. 9 (проектирование слоёв: Controller) и п. 15 (написание контроллеров).
- * Эндпоинты соответствуют ТЗ бэкенда:
+ * Эндпоинты соответствуют постановке бэкенда:
  * - GET    /api/posts/{postId}/comments                — получение всех комментариев к посту
  * - GET    /api/posts/{postId}/comments/{commentId}    — получение комментария
  * - POST   /api/posts/{postId}/comments                — добавление комментария
@@ -38,7 +39,7 @@ public class CommentController {
 
     /**
      * Получить все комментарии к посту.
-     * ТЗ: GET /api/posts/{id}/comments — возвращает JSON-массив.
+     * Постановка: GET /api/posts/{id}/comments — возвращает JSON-массив.
      */
     @GetMapping
     public List<CommentResponse> getCommentsByPostId(@PathVariable long postId) {
@@ -47,7 +48,7 @@ public class CommentController {
 
     /**
      * Получить комментарий по идентификаторам поста и комментария.
-     * ТЗ: GET /api/posts/{id}/comments/{commentId}
+     * Постановка: GET /api/posts/{id}/comments/{commentId}
      */
     @GetMapping("/{commentId}")
     public CommentResponse getComment(@PathVariable long postId, @PathVariable long commentId) {
@@ -56,7 +57,7 @@ public class CommentController {
 
     /**
      * Создать новый комментарий к посту.
-     * ТЗ: POST /api/posts/{id}/comments — фронт присылает text и postId.
+     * Постановка: POST /api/posts/{id}/comments — фронт присылает text и postId.
      */
     @PostMapping
     public CommentResponse createComment(@PathVariable long postId, @RequestBody CreateCommentRequest request) {
@@ -65,7 +66,7 @@ public class CommentController {
 
     /**
      * Редактировать комментарий.
-     * ТЗ: PUT /api/posts/{id}/comments/{commentId}
+     * Постановка: PUT /api/posts/{id}/comments/{commentId}
      */
     @PutMapping("/{commentId}")
     public CommentResponse updateComment(
@@ -75,7 +76,7 @@ public class CommentController {
 
     /**
      * Удалить комментарий.
-     * ТЗ: DELETE /api/posts/{id}/comments/{commentId} — возвращает 200 OK.
+     * Постановка: DELETE /api/posts/{id}/comments/{commentId} — возвращает 200 OK.
      */
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable long postId, @PathVariable long commentId) {

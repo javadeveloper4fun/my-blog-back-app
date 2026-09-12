@@ -21,6 +21,8 @@ import ru.yandex.practicum.config.WebConfig;
  * и встроенной БД H2.
  * Поднимают реальные контроллеры, сервисы и DAO через MockMvcBuilders.webAppContextSetup.
  *
+ * Спринт 3: Тема 9 «Модульное и интеграционное тестирование в Spring» (MockMvc)
+ * и Тема 10 «TestContext Framework» (@SpringJUnitWebConfig + @Transactional).
  * Реализация п. 17 (интеграционные тесты на MVC с WebMvc и Embedded H2).
  */
 @SpringJUnitWebConfig(classes = {WebConfig.class, DataConfig.class, IntegrationTestConfig.class})

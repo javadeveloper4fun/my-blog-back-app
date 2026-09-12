@@ -25,6 +25,8 @@ import ru.yandex.practicum.service.CommentService;
  * Unit-тесты CommentController с использованием MockMvc (standalone).
  * Проверяют REST-эндпоинты комментариев с мокированием CommentService.
  *
+ * Спринт 3: Тема 9 «Модульное и интеграционное тестирование в Spring»
+ * (JUnit 5 + Mockito + MockMvc standalone).
  * Реализация п. 17 (интеграционные тесты на MVC с WebMvc).
  */
 @ExtendWith(MockitoExtension.class)

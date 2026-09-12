@@ -14,6 +14,11 @@ import ru.yandex.practicum.model.Comment;
 /**
  * JDBC-реализация DAO для комментариев.
  * Все запросы к таблице comments выполняются через JdbcTemplate.
+ *
+ * Спринт 3: Тема 2 «Spring как IoC-контейнер» (DI через конструктор)
+ * и Тема 4 «Создание бинов через Java-аннотации» (@Repository).
+ * Используется JdbcTemplate — компонент Spring JDBC (Тема 8 практика).
+ * Реализация п. 9 (проектирование слоёв: DAO) и п. 15 (написание DAO).
  */
 @Repository
 public class CommentDaoImpl implements CommentDao {

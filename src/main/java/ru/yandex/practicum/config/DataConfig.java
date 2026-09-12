@@ -14,6 +14,8 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
  * Конфигурация подключения к базе данных H2.
  * Настраивает DataSource, JdbcTemplate и автоматическое выполнение schema.sql при старте.
  *
+ * Спринт 3: Тема 5 «Создание бинов через Java-конфигурации» (@Configuration + @Bean)
+ * и Тема 6 «Основные возможности Spring» (@Value + работа с ресурсами ClassPathResource).
  * Реализация п. 14 (Java-конфигурация для интеграции с СУБД).
  * П. 11 (структура БД — скрипт schema.sql выполняется при старте).
  */
