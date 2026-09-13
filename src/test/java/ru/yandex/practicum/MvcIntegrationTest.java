@@ -133,6 +133,19 @@ class MvcIntegrationTest {
     }
 
     @Test
+    void createPostWithoutTitleTest() throws Exception {
+        mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"text\":\"Текст без названия\",\"tags\":[]}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getPostsWithoutParamsTest() throws Exception {
+        mockMvc.perform(get("/api/posts")).andExpect(status().isBadRequest());
+    }
+
+    @Test
     void deletePostCascadeCommentsTest() throws Exception {
         String request = """
                 {"title":"Пост на удаление","text":"Текст","tags":[]}""";

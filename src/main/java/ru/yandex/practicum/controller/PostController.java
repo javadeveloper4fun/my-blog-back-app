@@ -1,5 +1,6 @@
 package ru.yandex.practicum.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +46,7 @@ public class PostController {
 
     /**
      * Получить список постов с поиском и пагинацией.
-     * Постановка: GET /api/posts?search=&pageNumber=1&pageSize=10
+     * Постановка: GET /api/posts?search=&pageNumber=1&pageSize=10 — все параметры обязательные.
      * П. 9 (слой Controller), п. 15 (написание контроллеров).
      *
      * @param search     строка поиска
@@ -55,9 +56,7 @@ public class PostController {
      */
     @GetMapping
     public PostListResponse getPosts(
-            @RequestParam(defaultValue = "") String search,
-            @RequestParam(defaultValue = "1") int pageNumber,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam String search, @RequestParam int pageNumber, @RequestParam int pageSize) {
         return postService.getPosts(search, pageNumber, pageSize);
     }
 
@@ -81,7 +80,7 @@ public class PostController {
      * @return созданный пост
      */
     @PostMapping
-    public PostResponse createPost(@RequestBody CreatePostRequest request) {
+    public PostResponse createPost(@Valid @RequestBody CreatePostRequest request) {
         return postService.createPost(request);
     }
 
@@ -94,7 +93,7 @@ public class PostController {
      * @return обновлённый пост
      */
     @PutMapping("/{id}")
-    public PostResponse updatePost(@PathVariable long id, @RequestBody UpdatePostRequest request) {
+    public PostResponse updatePost(@PathVariable long id, @Valid @RequestBody UpdatePostRequest request) {
         return postService.updatePost(id, request);
     }
 

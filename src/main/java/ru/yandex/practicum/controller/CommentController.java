@@ -1,5 +1,6 @@
 package ru.yandex.practicum.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,7 +72,7 @@ public class CommentController {
      * @return созданный комментарий
      */
     @PostMapping
-    public CommentResponse createComment(@PathVariable long postId, @RequestBody CreateCommentRequest request) {
+    public CommentResponse createComment(@PathVariable long postId, @Valid @RequestBody CreateCommentRequest request) {
         return commentService.createComment(postId, request);
     }
 
@@ -86,7 +87,7 @@ public class CommentController {
      */
     @PutMapping("/{commentId}")
     public CommentResponse updateComment(
-            @PathVariable long postId, @PathVariable long commentId, @RequestBody UpdateCommentRequest request) {
+            @PathVariable long postId, @PathVariable long commentId, @Valid @RequestBody UpdateCommentRequest request) {
         return commentService.updateComment(postId, commentId, request);
     }
 

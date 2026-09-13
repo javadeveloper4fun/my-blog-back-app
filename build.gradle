@@ -28,6 +28,9 @@ ext {
     junitBomVersion = '5.10.2'
     mockitoVersion = '5.10.0'
     jacksonVersion = '2.16.1'
+    validationApiVersion = '3.0.2'
+    hibernateValidatorVersion = '8.0.1.Final'
+    jakartaElVersion = '4.0.2'
 }
 
 dependencies {
@@ -44,6 +47,11 @@ dependencies {
 
     // Jackson (JSON serialization)
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+
+    // Bean Validation (JSR-380) — «все поля обязательные» по постановке
+    implementation "jakarta.validation:jakarta.validation-api:${validationApiVersion}"
+    runtimeOnly "org.hibernate.validator:hibernate-validator:${hibernateValidatorVersion}"
+    runtimeOnly "org.glassfish:jakarta.el:${jakartaElVersion}"
 
     // Servlet API (provided by Tomcat)
     providedCompile "jakarta.servlet:jakarta.servlet-api:${servletApiVersion}"
