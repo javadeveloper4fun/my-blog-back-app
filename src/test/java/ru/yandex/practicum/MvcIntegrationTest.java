@@ -146,6 +146,35 @@ class MvcIntegrationTest {
     }
 
     @Test
+    void getPostByGetMethodTest() throws Exception {
+        String request = """
+                {"title":"Пост для GET","text":"Текст","tags":["test"]}""";
+        String body = mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long id = extractId(body);
+
+        mockMvc.perform(get("/api/posts/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.title").value("Пост для GET"))
+                .andExpect(jsonPath("$.text").value("Текст"))
+                .andExpect(jsonPath("$.tags", hasSize(1)))
+                .andExpect(jsonPath("$.likesCount").value(0))
+                .andExpect(jsonPath("$.commentsCount").value(0));
+    }
+
+    @Test
+    void getCommentsWithInvalidPostIdTest() throws Exception {
+        mockMvc.perform(get("/api/posts/undefined/comments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
     void deletePostCascadeCommentsTest() throws Exception {
         String request = """
                 {"title":"Пост на удаление","text":"Текст","tags":[]}""";

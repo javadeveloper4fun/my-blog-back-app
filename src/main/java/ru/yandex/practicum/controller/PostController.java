@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,12 +63,15 @@ public class PostController {
 
     /**
      * Получить пост по идентификатору.
-     * Постановка: POST /api/posts/{id} (POST вместо GET — особенность фронтенда).
+     * Постановка: POST /api/posts/{id}. Дополнительно поддерживается GET /api/posts/{id}:
+     * собранный фронтенд открывает пост GET-запросом, поэтому эндпоинт принимает оба метода.
      *
      * @param id идентификатор поста
      * @return пост
      */
-    @PostMapping("/{id}")
+    @RequestMapping(
+            value = "/{id}",
+            method = {RequestMethod.POST, RequestMethod.GET})
     public PostResponse getPost(@PathVariable long id) {
         return postService.getPost(id);
     }

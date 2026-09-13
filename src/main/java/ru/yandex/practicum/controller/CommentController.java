@@ -41,13 +41,22 @@ public class CommentController {
     /**
      * Получить все комментарии к посту.
      * Постановка: GET /api/posts/{id}/comments — возвращает JSON-массив.
+     * Нечисловой postId (например, "undefined") интерпретируется как пустой список:
+     * собранный фронтенд при открытии поста первым запросом обращается к /comments,
+     * когда id ещё не загружен, и 500-ответ уронил бы страницу.
      *
      * @param postId идентификатор поста
      * @return список комментариев поста
      */
     @GetMapping
-    public List<CommentResponse> getCommentsByPostId(@PathVariable long postId) {
-        return commentService.getCommentsByPostId(postId);
+    public List<CommentResponse> getCommentsByPostId(@PathVariable String postId) {
+        long id;
+        try {
+            id = Long.parseLong(postId);
+        } catch (NumberFormatException e) {
+            return List.of();
+        }
+        return commentService.getCommentsByPostId(id);
     }
 
     /**
