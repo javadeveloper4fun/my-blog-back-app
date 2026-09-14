@@ -37,7 +37,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostListResponse getPosts(String search, int pageNumber, int pageSize) {
         validatePagination(pageNumber, pageSize);
-        return postDao.findAll(search, pageNumber, pageSize);
+        List<Post> posts = postDao.findAll(search, pageNumber, pageSize);
+        long totalPosts = postDao.countPosts(search);
+        int lastPage = (int) Math.ceil((double) totalPosts / pageSize);
+        if (lastPage == 0) lastPage = 1;
+
+        PostListResponse response = new PostListResponse();
+        response.setPosts(posts.stream().map(this::toListResponse).toList());
+        response.setHasPrev(pageNumber > 1);
+        response.setHasNext(pageNumber < lastPage);
+        response.setLastPage(lastPage);
+        return response;
     }
 
     @Override
@@ -97,6 +107,17 @@ public class PostServiceImpl implements PostService {
         if (pageSize > MAX_PAGE_SIZE) {
             throw new InvalidRequestException("pageSize не должен превышать " + MAX_PAGE_SIZE);
         }
+    }
+
+    private static final int MAX_TEXT_LENGTH = 128;
+
+    private PostResponse toListResponse(Post post) {
+        PostResponse response = toResponse(post);
+        String text = response.getText();
+        if (text != null && text.length() > MAX_TEXT_LENGTH) {
+            response.setText(text.substring(0, MAX_TEXT_LENGTH) + "…");
+        }
+        return response;
     }
 
     private PostResponse toResponse(Post post) {

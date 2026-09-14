@@ -9,8 +9,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.dto.PostListResponse;
-import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Post;
 
@@ -45,48 +43,22 @@ public class PostDaoImpl implements PostDao {
         return post;
     };
 
-    private final RowMapper<PostResponse> postResponseRowMapper = (rs, rowNum) -> {
-        PostResponse response = new PostResponse();
-        response.setId(rs.getLong("id"));
-        response.setTitle(rs.getString("title"));
-        response.setText(rs.getString("text"));
-        String tagsStr = rs.getString("tags");
-        if (tagsStr != null && !tagsStr.isEmpty()) {
-            response.setTags(Arrays.asList(tagsStr.split(",")));
-        } else {
-            response.setTags(List.of());
-        }
-        response.setLikesCount(rs.getLong("likes_count"));
-        response.setCommentsCount(rs.getLong("comments_count"));
-        return response;
-    };
-
     @Override
-    public PostListResponse findAll(String search, int pageNumber, int pageSize) {
+    public List<Post> findAll(String search, int pageNumber, int pageSize) {
         String whereClause = buildSearchClause(search);
-        String countSql = "SELECT COUNT(*) FROM posts" + whereClause;
-        long totalPosts = jdbcTemplate.queryForObject(countSql, Long.class, getSearchParams(search));
-        int lastPage = (int) Math.ceil((double) totalPosts / pageSize);
-        if (lastPage == 0) lastPage = 1;
-
         String sql = "SELECT p.*, " + "(SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count "
                 + "FROM posts p"
                 + whereClause + " ORDER BY p.id DESC LIMIT ? OFFSET ?";
         Object[] params = buildQueryParams(search, pageSize, (pageNumber - 1) * pageSize);
 
-        List<PostResponse> posts = jdbcTemplate.query(sql, postResponseRowMapper, params);
-        posts.forEach(p -> {
-            if (p.getText() != null && p.getText().length() > 128) {
-                p.setText(p.getText().substring(0, 128) + "…");
-            }
-        });
+        return jdbcTemplate.query(sql, postRowMapper, params);
+    }
 
-        PostListResponse response = new PostListResponse();
-        response.setPosts(posts);
-        response.setHasPrev(pageNumber > 1);
-        response.setHasNext(pageNumber < lastPage);
-        response.setLastPage(lastPage);
-        return response;
+    @Override
+    public long countPosts(String search) {
+        String whereClause = buildSearchClause(search);
+        String countSql = "SELECT COUNT(*) FROM posts p" + whereClause;
+        return jdbcTemplate.queryForObject(countSql, Long.class, getSearchParams(search));
     }
 
     @Override
@@ -159,8 +131,9 @@ public class PostDaoImpl implements PostDao {
         if (search == null || search.trim().isEmpty()) {
             return "";
         }
-        List<String> words =
-                Arrays.stream(search.split("\\s+")).filter(w -> !w.isEmpty()).toList();
+        List<String> words = Arrays.stream(search.split("\\s+"))
+                .filter(w -> !w.isEmpty())
+                .toList();
         List<String> conditions = new java.util.ArrayList<>();
         List<String> tagWords = new java.util.ArrayList<>();
         List<String> titleWords = new java.util.ArrayList<>();
@@ -185,8 +158,9 @@ public class PostDaoImpl implements PostDao {
         if (search == null || search.trim().isEmpty()) {
             return new Object[] {};
         }
-        List<String> words =
-                Arrays.stream(search.split("\\s+")).filter(w -> !w.isEmpty()).toList();
+        List<String> words = Arrays.stream(search.split("\\s+"))
+                .filter(w -> !w.isEmpty())
+                .toList();
         List<Object> params = new java.util.ArrayList<>();
         for (String w : words) {
             if (w.startsWith("#")) {

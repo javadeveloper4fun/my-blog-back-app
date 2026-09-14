@@ -2,6 +2,7 @@ package ru.yandex.practicum;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -11,8 +12,6 @@ import ru.yandex.practicum.dao.CommentDao;
 import ru.yandex.practicum.dao.CommentDaoImpl;
 import ru.yandex.practicum.dao.PostDao;
 import ru.yandex.practicum.dao.PostDaoImpl;
-import ru.yandex.practicum.dto.PostListResponse;
-import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Comment;
 import ru.yandex.practicum.model.Post;
@@ -60,13 +59,11 @@ class PostDaoTest {
 
     @Test
     void findAllEmptyListTest() {
-        PostListResponse response = postDao.findAll("", 1, 10);
+        List<Post> posts = postDao.findAll("", 1, 10);
 
-        assertNotNull(response);
-        assertTrue(response.getPosts().isEmpty());
-        assertFalse(response.isHasPrev());
-        assertFalse(response.isHasNext());
-        assertEquals(1, response.getLastPage());
+        assertNotNull(posts);
+        assertTrue(posts.isEmpty());
+        assertEquals(0L, postDao.countPosts(""));
     }
 
     @Test
@@ -75,16 +72,12 @@ class PostDaoTest {
         createPost("Пост 2", "Текст 2", "");
         createPost("Пост 3", "Текст 3", "");
 
-        PostListResponse firstPage = postDao.findAll("", 1, 2);
-        assertEquals(2, firstPage.getPosts().size());
-        assertFalse(firstPage.isHasPrev());
-        assertTrue(firstPage.isHasNext());
-        assertEquals(2, firstPage.getLastPage());
+        List<Post> firstPage = postDao.findAll("", 1, 2);
+        assertEquals(2, firstPage.size());
+        assertEquals(3L, postDao.countPosts(""));
 
-        PostListResponse secondPage = postDao.findAll("", 2, 2);
-        assertEquals(1, secondPage.getPosts().size());
-        assertTrue(secondPage.isHasPrev());
-        assertFalse(secondPage.isHasNext());
+        List<Post> secondPage = postDao.findAll("", 2, 2);
+        assertEquals(1, secondPage.size());
     }
 
     @Test
@@ -92,10 +85,10 @@ class PostDaoTest {
         long first = createPost("Ранний пост", "Текст", "");
         long second = createPost("Поздний пост", "Текст", "");
 
-        PostListResponse response = postDao.findAll("", 1, 10);
+        List<Post> posts = postDao.findAll("", 1, 10);
 
-        assertEquals(second, response.getPosts().get(0).getId());
-        assertEquals(first, response.getPosts().get(1).getId());
+        assertEquals(second, posts.get(0).getId());
+        assertEquals(first, posts.get(1).getId());
     }
 
     @Test
@@ -104,11 +97,12 @@ class PostDaoTest {
         createPost("Погода в городе", "Прогноз", "");
         createPost("Кофе с молоком", "Рецепт", "");
 
-        PostListResponse response = postDao.findAll("Кофе", 1, 10);
+        List<Post> posts = postDao.findAll("Кофе", 1, 10);
 
-        assertEquals(2, response.getPosts().size());
-        assertTrue(response.getPosts().stream().anyMatch(p -> p.getTitle().equals("Как варить Кофе")));
-        assertTrue(response.getPosts().stream().anyMatch(p -> p.getTitle().equals("Кофе с молоком")));
+        assertEquals(2, posts.size());
+        assertEquals(2L, postDao.countPosts("Кофе"));
+        assertTrue(posts.stream().anyMatch(p -> p.getTitle().equals("Как варить Кофе")));
+        assertTrue(posts.stream().anyMatch(p -> p.getTitle().equals("Кофе с молоком")));
     }
 
     @Test
@@ -116,10 +110,10 @@ class PostDaoTest {
         createPost("Пост по java", "Текст", "java,backend");
         createPost("Пост по весне", "Текст", "spring");
 
-        PostListResponse response = postDao.findAll("#java", 1, 10);
+        List<Post> posts = postDao.findAll("#java", 1, 10);
 
-        assertEquals(1, response.getPosts().size());
-        assertEquals("Пост по java", response.getPosts().get(0).getTitle());
+        assertEquals(1, posts.size());
+        assertEquals("Пост по java", posts.get(0).getTitle());
     }
 
     @Test
@@ -128,22 +122,20 @@ class PostDaoTest {
         createPost("Урок по Java", "Текст", "java");
         createPost("Другой урок", "Текст", "spring");
 
-        PostListResponse response = postDao.findAll("Урок #java", 1, 10);
+        List<Post> posts = postDao.findAll("Урок #java", 1, 10);
 
-        assertEquals(2, response.getPosts().size());
+        assertEquals(2, posts.size());
     }
 
     @Test
-    void truncateLongTextInListTest() {
+    void truncateLongTextNotAppliedInDaoTest() {
         String longText = "а".repeat(200);
         createPost("Пост с длинным текстом", longText, "");
 
-        PostListResponse response = postDao.findAll("", 1, 10);
+        List<Post> posts = postDao.findAll("", 1, 10);
 
-        assertEquals(1, response.getPosts().size());
-        assertEquals(129, response.getPosts().get(0).getText().length());
-        assertTrue(response.getPosts().get(0).getText().startsWith("а".repeat(128)));
-        assertTrue(response.getPosts().get(0).getText().endsWith("…"));
+        assertEquals(1, posts.size());
+        assertEquals(200, posts.get(0).getText().length());
     }
 
     @Test
@@ -153,13 +145,13 @@ class PostDaoTest {
         Post post = postDao.findById(id);
         post.setTitle("Новое название");
         post.setText("Новый текст");
-        post.setTags("spring");
+        post.setTags("spring,web");
 
         Post updated = postDao.update(post);
 
         assertEquals("Новое название", updated.getTitle());
         assertEquals("Новый текст", updated.getText());
-        assertEquals("spring", updated.getTags());
+        assertEquals("spring,web", updated.getTags());
     }
 
     @Test
@@ -197,8 +189,8 @@ class PostDaoTest {
         Post found = postDao.findById(id);
         assertEquals(2L, found.getCommentsCount());
 
-        PostListResponse response = postDao.findAll("", 1, 10);
-        PostResponse listed = response.getPosts().get(0);
+        List<Post> posts = postDao.findAll("", 1, 10);
+        Post listed = posts.get(0);
         assertEquals(2L, listed.getCommentsCount());
     }
 

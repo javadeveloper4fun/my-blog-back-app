@@ -1,6 +1,6 @@
 package ru.yandex.practicum.dao;
 
-import ru.yandex.practicum.dto.PostListResponse;
+import java.util.List;
 import ru.yandex.practicum.model.Post;
 
 /**
@@ -10,14 +10,24 @@ import ru.yandex.practicum.model.Post;
 public interface PostDao {
 
     /**
-     * Получить список постов с поиском и пагинацией.
+     * Получить страницу постов с поиском и пагинацией.
+     * Только данные из БД: без обрезки текста и без формирования DTO ответа API.
      *
      * @param search     строка поиска (слова с # фильтруют по тегам, остальные — по title)
      * @param pageNumber номер страницы (начиная с 1)
      * @param pageSize   число постов на странице
-     * @return ответ со списком постов и метаинформацией пагинации
+     * @return посты текущей страницы
      */
-    PostListResponse findAll(String search, int pageNumber, int pageSize);
+    List<Post> findAll(String search, int pageNumber, int pageSize);
+
+    /**
+     * Получить общее количество постов, удовлетворяющих поиску.
+     * Используется сервисом для расчёта метаинформации пагинации.
+     *
+     * @param search строка поиска (та же, что передаётся в {@link #findAll})
+     * @return общее количество постов по поиску
+     */
+    long countPosts(String search);
 
     /**
      * Получить пост по идентификатору.
