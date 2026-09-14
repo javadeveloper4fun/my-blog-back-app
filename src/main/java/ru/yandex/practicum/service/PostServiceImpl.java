@@ -61,7 +61,7 @@ public class PostServiceImpl implements PostService {
         Post post = new Post();
         post.setTitle(request.getTitle());
         post.setText(request.getText());
-        post.setTags(convertTagsToString(request.getTags()));
+        post.setTags(convertTagsToString(normalizeTags(request.getTags())));
         post.setLikesCount(0L);
         Post saved = postDao.save(post);
         return toResponse(saved);
@@ -72,7 +72,7 @@ public class PostServiceImpl implements PostService {
         Post post = postDao.findById(id);
         post.setTitle(request.getTitle());
         post.setText(request.getText());
-        post.setTags(convertTagsToString(request.getTags()));
+        post.setTags(convertTagsToString(normalizeTags(request.getTags())));
         Post updated = postDao.update(post);
         return toResponse(updated);
     }
@@ -129,6 +129,28 @@ public class PostServiceImpl implements PostService {
         response.setLikesCount(post.getLikesCount());
         response.setCommentsCount(post.getCommentsCount() != null ? post.getCommentsCount() : 0L);
         return response;
+    }
+
+    private List<String> normalizeTags(List<String> tags) {
+        if (tags == null) {
+            return new ArrayList<>();
+        }
+        List<String> normalized = new ArrayList<>();
+        for (String tag : tags) {
+            validateTag(tag);
+            String trimmed = tag.trim().toLowerCase();
+            if (trimmed.isEmpty() || normalized.contains(trimmed)) {
+                continue;
+            }
+            normalized.add(trimmed);
+        }
+        return normalized;
+    }
+
+    private void validateTag(String tag) {
+        if (tag != null && tag.contains(",")) {
+            throw new InvalidRequestException("Тег не может содержать запятую: \"" + tag + "\"");
+        }
     }
 
     private String convertTagsToString(List<String> tags) {

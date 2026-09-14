@@ -132,4 +132,38 @@ class PostServiceTest {
                 200,
                 postService.getPost(list.getPosts().get(0).getId()).getText().length());
     }
+
+    @Test
+    void tagsAreNormalizedOnCreateTest() {
+        CreatePostRequest request = new CreatePostRequest();
+        request.setTitle("Пост с тегами");
+        request.setText("Текст");
+        request.setTags(java.util.List.of("  Java ", "java", "Spring", " ", "SQL"));
+
+        var created = postService.createPost(request);
+
+        assertEquals(java.util.List.of("java", "spring", "sql"), created.getTags());
+    }
+
+    @Test
+    void nullTagsBecomeEmptyListTest() {
+        CreatePostRequest request = new CreatePostRequest();
+        request.setTitle("Пост без тегов");
+        request.setText("Текст");
+        request.setTags(null);
+
+        var created = postService.createPost(request);
+
+        assertEquals(java.util.List.of(), created.getTags());
+    }
+
+    @Test
+    void tagWithCommaThrowsTest() {
+        CreatePostRequest request = new CreatePostRequest();
+        request.setTitle("Пост с невалидным тегом");
+        request.setText("Текст");
+        request.setTags(java.util.List.of("java,backend"));
+
+        assertThrows(InvalidRequestException.class, () -> postService.createPost(request));
+    }
 }

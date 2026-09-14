@@ -146,6 +146,14 @@ class MvcIntegrationTest {
     }
 
     @Test
+    void createPostWithInvalidTagTest() throws Exception {
+        mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Пост\",\"text\":\"Текст\",\"tags\":[\"java,backend\"]}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getPostsWithInvalidPaginationTest() throws Exception {
         mockMvc.perform(get("/api/posts")
                         .param("search", "")
