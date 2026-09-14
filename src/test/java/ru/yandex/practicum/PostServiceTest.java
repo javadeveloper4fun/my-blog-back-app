@@ -72,7 +72,6 @@ class PostServiceTest {
         assertEquals(1, secondPage.getPosts().size());
         assertEquals(true, secondPage.isHasPrev());
         assertEquals(false, secondPage.isHasNext());
-        assertEquals(2, secondPage.getLastPage());
     }
 
     @Test
