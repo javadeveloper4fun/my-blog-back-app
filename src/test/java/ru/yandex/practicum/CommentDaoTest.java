@@ -111,6 +111,25 @@ class CommentDaoTest {
     }
 
     @Test
+    void updateCommentForWrongPostThrowsTest() {
+        long postId1 = createPost();
+        long postId2 = createPost();
+
+        Comment comment = new Comment();
+        comment.setText("Комментарий к посту 1");
+        comment.setPostId(postId1);
+        long commentId = commentDao.save(comment).getId();
+
+        Comment found = commentDao.findById(postId1, commentId);
+        found.setText("Новый текст");
+        found.setPostId(postId2);
+
+        assertThrows(NotFoundException.class, () -> commentDao.update(found));
+        assertEquals(
+                "Комментарий к посту 1", commentDao.findById(postId1, commentId).getText());
+    }
+
+    @Test
     void deleteCommentTest() {
         long postId = createPost();
 

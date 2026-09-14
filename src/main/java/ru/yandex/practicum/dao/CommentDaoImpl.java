@@ -71,9 +71,13 @@ public class CommentDaoImpl implements CommentDao {
 
     @Override
     public Comment update(Comment comment) {
-        String sql = "UPDATE comments SET text = ? WHERE id = ?";
-        jdbcTemplate.update(sql, comment.getText(), comment.getId());
-        return comment;
+        String sql = "UPDATE comments SET text = ? WHERE id = ? AND post_id = ?";
+        int updated = jdbcTemplate.update(sql, comment.getText(), comment.getId(), comment.getPostId());
+        if (updated == 0) {
+            throw new NotFoundException(
+                    "Комментарий с id=" + comment.getId() + " к посту id=" + comment.getPostId() + " не найден");
+        }
+        return findById(comment.getPostId(), comment.getId());
     }
 
     @Override

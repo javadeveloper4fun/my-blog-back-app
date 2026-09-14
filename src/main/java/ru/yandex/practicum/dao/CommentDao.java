@@ -35,10 +35,14 @@ public interface CommentDao {
     Comment save(Comment comment);
 
     /**
-     * Обновить существующий комментарий.
+     * Обновить существующий комментарий в рамках указанного поста.
+     * Обновление выполняется по паре postId + commentId: запрос к одному посту
+     * не может случайно изменить комментарий другого поста.
      *
-     * @param comment комментарий с заполненным id и новым текстом
-     * @return обновлённый комментарий
+     * @param comment комментарий с заполненными id, postId и новым текстом
+     * @return обновлённый комментарий (перечитанный из БД)
+     * @throws ru.yandex.practicum.exception.NotFoundException если комментарий
+     *         не найден в рамках указанного поста
      */
     Comment update(Comment comment);
 
