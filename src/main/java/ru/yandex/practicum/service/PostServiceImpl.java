@@ -61,7 +61,7 @@ public class PostServiceImpl implements PostService {
         Post post = new Post();
         post.setTitle(request.getTitle());
         post.setText(request.getText());
-        post.setTags(convertTagsToString(normalizeTags(request.getTags())));
+        post.setTags(normalizeTags(request.getTags()));
         post.setLikesCount(0L);
         Post saved = postDao.save(post);
         return toResponse(saved);
@@ -72,7 +72,7 @@ public class PostServiceImpl implements PostService {
         Post post = postDao.findById(id);
         post.setTitle(request.getTitle());
         post.setText(request.getText());
-        post.setTags(convertTagsToString(normalizeTags(request.getTags())));
+        post.setTags(normalizeTags(request.getTags()));
         Post updated = postDao.update(post);
         return toResponse(updated);
     }
@@ -125,7 +125,7 @@ public class PostServiceImpl implements PostService {
         response.setId(post.getId());
         response.setTitle(post.getTitle());
         response.setText(post.getText());
-        response.setTags(convertStringToTags(post.getTags()));
+        response.setTags(post.getTags() != null ? post.getTags() : List.of());
         response.setLikesCount(post.getLikesCount());
         response.setCommentsCount(post.getCommentsCount() != null ? post.getCommentsCount() : 0L);
         return response;
@@ -133,7 +133,7 @@ public class PostServiceImpl implements PostService {
 
     private List<String> normalizeTags(List<String> tags) {
         if (tags == null) {
-            return new ArrayList<>();
+            return List.of();
         }
         List<String> normalized = new ArrayList<>();
         for (String tag : tags) {
@@ -151,19 +151,5 @@ public class PostServiceImpl implements PostService {
         if (tag != null && tag.contains(",")) {
             throw new InvalidRequestException("Тег не может содержать запятую: \"" + tag + "\"");
         }
-    }
-
-    private String convertTagsToString(List<String> tags) {
-        if (tags == null || tags.isEmpty()) {
-            return "";
-        }
-        return String.join(",", tags);
-    }
-
-    private List<String> convertStringToTags(String tagsStr) {
-        if (tagsStr == null || tagsStr.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return List.of(tagsStr.split(","));
     }
 }

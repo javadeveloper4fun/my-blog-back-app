@@ -2,8 +2,9 @@ package ru.yandex.practicum.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,6 +16,7 @@ import ru.yandex.practicum.model.Post;
 /**
  * JDBC-реализация DAO для постов.
  * Все запросы к таблице posts выполняются через JdbcTemplate.
+ * Теги хранятся в отдельной таблице post_tags и агрегируются в модель Post.
  *
  * Спринт 3: Тема 2 «Spring как IoC-контейнер» (DI через конструктор)
  * и Тема 4 «Создание бинов через Java-аннотации» (@Repository).
@@ -24,6 +26,8 @@ import ru.yandex.practicum.model.Post;
  */
 @Repository
 public class PostDaoImpl implements PostDao {
+
+    private static final String INSERT_TAG_SQL = "INSERT INTO post_tags (post_id, tag) VALUES (?, ?)";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -36,7 +40,6 @@ public class PostDaoImpl implements PostDao {
         post.setId(rs.getLong("id"));
         post.setTitle(rs.getString("title"));
         post.setText(rs.getString("text"));
-        post.setTags(rs.getString("tags"));
         post.setLikesCount(rs.getLong("likes_count"));
         post.setImage(rs.getBytes("image"));
         post.setCommentsCount(rs.getLong("comments_count"));
@@ -51,7 +54,9 @@ public class PostDaoImpl implements PostDao {
                 + whereClause + " ORDER BY p.id DESC LIMIT ? OFFSET ?";
         Object[] params = buildQueryParams(search, pageSize, (pageNumber - 1) * pageSize);
 
-        return jdbcTemplate.query(sql, postRowMapper, params);
+        List<Post> posts = jdbcTemplate.query(sql, postRowMapper, params);
+        attachTags(posts);
+        return posts;
     }
 
     @Override
@@ -66,7 +71,9 @@ public class PostDaoImpl implements PostDao {
         String sql = "SELECT p.*, " + "(SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count "
                 + "FROM posts p WHERE p.id = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, postRowMapper, id);
+            Post post = jdbcTemplate.queryForObject(sql, postRowMapper, id);
+            attachTags(post);
+            return post;
         } catch (org.springframework.dao.EmptyResultDataAccessException e) {
             throw new NotFoundException("Пост с id=" + id + " не найден");
         }
@@ -74,26 +81,28 @@ public class PostDaoImpl implements PostDao {
 
     @Override
     public Post save(Post post) {
-        String sql = "INSERT INTO posts (title, text, tags, likes_count) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO posts (title, text, likes_count) VALUES (?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> {
                     PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     ps.setString(1, post.getTitle());
                     ps.setString(2, post.getText());
-                    ps.setString(3, post.getTags());
-                    ps.setLong(4, post.getLikesCount() != null ? post.getLikesCount() : 0);
+                    ps.setLong(3, post.getLikesCount() != null ? post.getLikesCount() : 0);
                     return ps;
                 },
                 keyHolder);
-        post.setId(keyHolder.getKey().longValue());
+        long id = keyHolder.getKey().longValue();
+        post.setId(id);
+        saveTags(id, post.getTags());
         return post;
     }
 
     @Override
     public Post update(Post post) {
-        String sql = "UPDATE posts SET title = ?, text = ?, tags = ? WHERE id = ?";
-        jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getTags(), post.getId());
+        String sql = "UPDATE posts SET title = ?, text = ? WHERE id = ?";
+        jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getId());
+        replaceTags(post.getId(), post.getTags());
         return findById(post.getId());
     }
 
@@ -127,24 +136,62 @@ public class PostDaoImpl implements PostDao {
         }
     }
 
+    private void attachTags(List<Post> posts) {
+        if (posts.isEmpty()) {
+            return;
+        }
+        List<Long> ids = posts.stream().map(Post::getId).toList();
+        String placeholders = ids.stream().map(id -> "?").collect(Collectors.joining(", "));
+        String sql = "SELECT post_id, tag FROM post_tags WHERE post_id IN (" + placeholders + ") ORDER BY tag";
+        Map<Long, List<String>> tagsByPost = jdbcTemplate
+                .query(sql, (rs, rowNum) -> Map.entry(rs.getLong("post_id"), rs.getString("tag")), (Object[])
+                        ids.toArray())
+                .stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+        posts.forEach(post -> post.setTags(tagsByPost.getOrDefault(post.getId(), List.of())));
+    }
+
+    private void attachTags(Post post) {
+        attachTags(List.of(post));
+    }
+
+    private void saveTags(long postId, List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return;
+        }
+        insertTags(postId, tags);
+    }
+
+    private void replaceTags(long postId, List<String> tags) {
+        String sql = "DELETE FROM post_tags WHERE post_id = ?";
+        jdbcTemplate.update(sql, postId);
+        saveTags(postId, tags);
+    }
+
+    private void insertTags(long postId, List<String> tags) {
+        List<Object[]> batch =
+                tags.stream().map(tag -> new Object[] {postId, tag}).collect(Collectors.toList());
+        jdbcTemplate.batchUpdate(INSERT_TAG_SQL, batch);
+    }
+
     private String buildSearchClause(String search) {
         if (search == null || search.trim().isEmpty()) {
             return "";
         }
-        List<String> words = Arrays.stream(search.split("\\s+"))
+        List<String> words = java.util.Arrays.stream(search.split("\\s+"))
                 .filter(w -> !w.isEmpty())
                 .toList();
         List<String> conditions = new java.util.ArrayList<>();
-        List<String> tagWords = new java.util.ArrayList<>();
         List<String> titleWords = new java.util.ArrayList<>();
         for (String w : words) {
             if (w.startsWith("#")) {
-                tagWords.add(w);
+                conditions.add(
+                        "EXISTS (SELECT 1 FROM post_tags pt WHERE pt.post_id = p.id AND LOWER(pt.tag) = LOWER(?))");
             } else {
                 titleWords.add(w);
             }
         }
-        tagWords.forEach(w -> conditions.add("tags LIKE ?"));
         if (!titleWords.isEmpty()) {
             conditions.add("title LIKE ?");
         }
@@ -158,13 +205,13 @@ public class PostDaoImpl implements PostDao {
         if (search == null || search.trim().isEmpty()) {
             return new Object[] {};
         }
-        List<String> words = Arrays.stream(search.split("\\s+"))
+        List<String> words = java.util.Arrays.stream(search.split("\\s+"))
                 .filter(w -> !w.isEmpty())
                 .toList();
         List<Object> params = new java.util.ArrayList<>();
         for (String w : words) {
             if (w.startsWith("#")) {
-                params.add("%" + w.substring(1) + "%");
+                params.add(w.substring(1).trim().toLowerCase());
             }
         }
         List<String> titleWords =

@@ -37,7 +37,7 @@ class CommentDaoTest {
         Post post = new Post();
         post.setTitle("Пост для комментариев");
         post.setText("Текст");
-        post.setTags("");
+        post.setTags(List.of());
         post.setLikesCount(0L);
         return postDao.save(post).getId();
     }
