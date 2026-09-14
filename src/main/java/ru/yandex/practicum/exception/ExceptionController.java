@@ -20,9 +20,24 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionController {
 
+    private static final System.Logger LOGGER = System.getLogger(ExceptionController.class.getName());
+
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFound(NotFoundException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    /**
+     * Ошибки проверки параметров запроса (например, невалидная пагинация pageNumber/pageSize,
+     * некорректные теги). Исключение бросается в слое сервиса.
+     *
+     * @param e исключение неверного запроса
+     * @return JSON-ошибка со статусом 400
+     */
+    @ExceptionHandler(InvalidRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInvalidRequest(InvalidRequestException e) {
         return Map.of("error", e.getMessage());
     }
 
@@ -53,6 +68,7 @@ public class ExceptionController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleInternalError(Exception e) {
-        return Map.of("error", e.getMessage());
+        LOGGER.log(System.Logger.Level.ERROR, "Непредвиденная ошибка", e);
+        return Map.of("error", "Internal Server Error");
     }
 }

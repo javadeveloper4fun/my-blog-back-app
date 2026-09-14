@@ -146,6 +146,25 @@ class MvcIntegrationTest {
     }
 
     @Test
+    void getPostsWithInvalidPaginationTest() throws Exception {
+        mockMvc.perform(get("/api/posts")
+                        .param("search", "")
+                        .param("pageNumber", "0")
+                        .param("pageSize", "10"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/posts")
+                        .param("search", "")
+                        .param("pageNumber", "1")
+                        .param("pageSize", "0"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/posts")
+                        .param("search", "")
+                        .param("pageNumber", "1")
+                        .param("pageSize", "101"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getPostByGetMethodTest() throws Exception {
         String request = """
                 {"title":"Пост для GET","text":"Текст","tags":["test"]}""";

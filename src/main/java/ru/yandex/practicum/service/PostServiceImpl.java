@@ -8,6 +8,7 @@ import ru.yandex.practicum.dto.CreatePostRequest;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.dto.UpdatePostRequest;
+import ru.yandex.practicum.exception.InvalidRequestException;
 import ru.yandex.practicum.model.Post;
 
 /**
@@ -24,12 +25,18 @@ public class PostServiceImpl implements PostService {
 
     private final PostDao postDao;
 
+    /**
+     * Максимально допустимый размер страницы при пагинации.
+     */
+    private static final int MAX_PAGE_SIZE = 100;
+
     public PostServiceImpl(PostDao postDao) {
         this.postDao = postDao;
     }
 
     @Override
     public PostListResponse getPosts(String search, int pageNumber, int pageSize) {
+        validatePagination(pageNumber, pageSize);
         return postDao.findAll(search, pageNumber, pageSize);
     }
 
@@ -78,6 +85,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public byte[] getImage(long id) {
         return postDao.getImage(id);
+    }
+
+    private void validatePagination(int pageNumber, int pageSize) {
+        if (pageNumber < 1) {
+            throw new InvalidRequestException("pageNumber должен быть не меньше 1");
+        }
+        if (pageSize < 1) {
+            throw new InvalidRequestException("pageSize должен быть не меньше 1");
+        }
+        if (pageSize > MAX_PAGE_SIZE) {
+            throw new InvalidRequestException("pageSize не должен превышать " + MAX_PAGE_SIZE);
+        }
     }
 
     private PostResponse toResponse(Post post) {
