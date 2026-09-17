@@ -1,0 +1,99 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'com.diffplug.spotless' version '8.10.2'
+    id 'checkstyle'
+}
+
+group = 'ru.yandex.practicum'
+version = '0.1.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    compileJava.options.compilerArgs.add('-parameters')
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    springVersion = '6.1.14'
+    springDataVersion = '3.2.12'
+    h2Version = '2.2.224'
+    lombokVersion = '1.18.34'
+    servletApiVersion = '6.0.0'
+    junitBomVersion = '5.10.2'
+    mockitoVersion = '5.10.0'
+    jacksonVersion = '2.16.1'
+    validationApiVersion = '3.0.2'
+    hibernateValidatorVersion = '8.0.1.Final'
+    jakartaElVersion = '4.0.2'
+}
+
+dependencies {
+    // Spring Framework
+    implementation "org.springframework:spring-context:${springVersion}"
+    implementation "org.springframework:spring-webmvc:${springVersion}"
+    implementation "org.springframework:spring-jdbc:${springVersion}"
+
+    // Spring Data JDBC
+    implementation "org.springframework.data:spring-data-jdbc:${springDataVersion}"
+
+    // H2 Database
+    runtimeOnly "com.h2database:h2:${h2Version}"
+
+    // Jackson (JSON serialization)
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+
+    // Bean Validation (JSR-380) — «все поля обязательные» по постановке
+    implementation "jakarta.validation:jakarta.validation-api:${validationApiVersion}"
+    runtimeOnly "org.hibernate.validator:hibernate-validator:${hibernateValidatorVersion}"
+    runtimeOnly "org.glassfish:jakarta.el:${jakartaElVersion}"
+
+    // Servlet API (provided by Tomcat)
+    providedCompile "jakarta.servlet:jakarta.servlet-api:${servletApiVersion}"
+
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    // Tests
+    testImplementation platform("org.junit:junit-bom:${junitBomVersion}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation "org.springframework:spring-test:${springVersion}"
+    testImplementation "org.springframework:spring-webmvc:${springVersion}"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    testImplementation "com.h2database:h2:${h2Version}"
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'com.jayway.jsonpath:json-path:2.9.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+war {
+    archiveBaseName.set('my-blog-back-app')
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        palantirJavaFormat('2.98.0')
+        removeUnusedImports()
+    }
+}
+
+checkstyle {
+    toolVersion = '10.12.5'
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+    ignoreFailures = false
+}
