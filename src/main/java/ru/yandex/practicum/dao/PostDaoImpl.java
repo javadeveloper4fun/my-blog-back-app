@@ -115,7 +115,10 @@ public class PostDaoImpl implements PostDao {
     @Override
     public long incrementLikes(long id) {
         String sql = "UPDATE posts SET likes_count = likes_count + 1 WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        int updated = jdbcTemplate.update(sql, id);
+        if (updated == 0) {
+            throw new NotFoundException("Пост с id=" + id + " не найден");
+        }
         String selectSql = "SELECT likes_count FROM posts WHERE id = ?";
         return jdbcTemplate.queryForObject(selectSql, Long.class, id);
     }
@@ -123,7 +126,10 @@ public class PostDaoImpl implements PostDao {
     @Override
     public void updateImage(long id, byte[] image) {
         String sql = "UPDATE posts SET image = ? WHERE id = ?";
-        jdbcTemplate.update(sql, image, id);
+        int updated = jdbcTemplate.update(sql, image, id);
+        if (updated == 0) {
+            throw new NotFoundException("Пост с id=" + id + " не найден");
+        }
     }
 
     @Override

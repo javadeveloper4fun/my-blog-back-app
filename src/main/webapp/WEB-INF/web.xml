@@ -4,8 +4,9 @@
     и Тема 8 «Практика по разработке Spring Framework» (Tomcat, war).
     Реализация п. 12 (инфраструктура для создания war-файла).
     П. 13 (интеграция Spring-приложения с сервлет-контейнером):
-    - ContextLoaderListener поднимает корневой контекст Spring (DataConfig)
-    - DispatcherServlet обрабатывает REST-запросы (WebConfig)
+    единый контекст Spring поднимается через DispatcherServlet (WebConfig),
+    чей @ComponentScan инициализирует DataConfig, DAO, сервисы и контроллеры
+    ровно по одному разу (без дублирования бинов из корневого контекста).
 -->
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -14,19 +15,6 @@
          version="6.0">
 
     <display-name>My Blog Backend</display-name>
-
-    <context-param>
-        <param-name>contextClass</param-name>
-        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-    </context-param>
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>ru.yandex.practicum.config.DataConfig</param-value>
-    </context-param>
-
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
 
     <servlet>
         <servlet-name>dispatcher</servlet-name>
@@ -37,6 +25,7 @@
         </init-param>
         <init-param>
             <param-name>contextConfigLocation</param-name>
+            <!-- WebConfig содержит @ComponentScan, который подхватит DataConfig, DAO, сервисы и контроллеры -->
             <param-value>ru.yandex.practicum.config.WebConfig</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -48,7 +37,8 @@
 
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <!-- "/" принимает все запросы, но не перехватывает внутренние ресурсы контейнера (в отличие от "/*") -->
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
 </web-app>

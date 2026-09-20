@@ -234,4 +234,14 @@ class PostDaoTest {
     void getImageForMissingPostThrowsTest() {
         assertThrows(NotFoundException.class, () -> postDao.getImage(9999L));
     }
+
+    @Test
+    void incrementLikesForMissingPostThrowsTest() {
+        assertThrows(NotFoundException.class, () -> postDao.incrementLikes(9999L));
+    }
+
+    @Test
+    void updateImageForMissingPostThrowsTest() {
+        assertThrows(NotFoundException.class, () -> postDao.updateImage(9999L, new byte[] {1, 2}));
+    }
 }

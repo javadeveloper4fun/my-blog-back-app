@@ -148,7 +148,10 @@ public class PostServiceImpl implements PostService {
     }
 
     private void validateTag(String tag) {
-        if (tag != null && tag.contains(",")) {
+        if (tag == null || tag.trim().isEmpty()) {
+            throw new InvalidRequestException("Тег не может быть пустым");
+        }
+        if (tag.contains(",")) {
             throw new InvalidRequestException("Тег не может содержать запятую: \"" + tag + "\"");
         }
     }

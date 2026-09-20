@@ -14,6 +14,7 @@ import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.dto.CreatePostRequest;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.exception.InvalidRequestException;
+import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.service.CommentServiceImpl;
 import ru.yandex.practicum.service.PostServiceImpl;
 
@@ -137,11 +138,41 @@ class PostServiceTest {
         CreatePostRequest request = new CreatePostRequest();
         request.setTitle("Пост с тегами");
         request.setText("Текст");
-        request.setTags(java.util.List.of("  Java ", "java", "Spring", " ", "SQL"));
+        request.setTags(java.util.List.of("  Java ", "java", "Spring", "SQL"));
 
         var created = postService.createPost(request);
 
         assertEquals(java.util.List.of("java", "spring", "sql"), created.getTags());
+    }
+
+    @Test
+    void nullTagThrowsTest() {
+        CreatePostRequest request = new CreatePostRequest();
+        request.setTitle("Пост с null-тегом");
+        request.setText("Текст");
+        request.setTags(java.util.Arrays.asList("java", null, "spring"));
+
+        assertThrows(InvalidRequestException.class, () -> postService.createPost(request));
+    }
+
+    @Test
+    void blankTagThrowsTest() {
+        CreatePostRequest request = new CreatePostRequest();
+        request.setTitle("Пост с пустым тегом");
+        request.setText("Текст");
+        request.setTags(java.util.List.of("java", "  "));
+
+        assertThrows(InvalidRequestException.class, () -> postService.createPost(request));
+    }
+
+    @Test
+    void createCommentToMissingPostThrowsTest() {
+        long missingPostId = 9999L;
+        CreateCommentRequest request = new CreateCommentRequest();
+        request.setText("Комментарий к несуществующему посту");
+        request.setPostId(missingPostId);
+
+        assertThrows(NotFoundException.class, () -> commentService.createComment(missingPostId, request));
     }
 
     @Test

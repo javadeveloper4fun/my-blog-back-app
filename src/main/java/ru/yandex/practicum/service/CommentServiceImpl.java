@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dao.CommentDao;
+import ru.yandex.practicum.dao.PostDao;
 import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.dto.UpdateCommentRequest;
@@ -21,9 +22,11 @@ import ru.yandex.practicum.model.Comment;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;
+    private final PostDao postDao;
 
-    public CommentServiceImpl(CommentDao commentDao) {
+    public CommentServiceImpl(CommentDao commentDao, PostDao postDao) {
         this.commentDao = commentDao;
+        this.postDao = postDao;
     }
 
     @Override
@@ -40,6 +43,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentResponse createComment(long postId, CreateCommentRequest request) {
+        postDao.findById(postId);
         Comment comment = new Comment();
         comment.setText(request.getText());
         comment.setPostId(postId);

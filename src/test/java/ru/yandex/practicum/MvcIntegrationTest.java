@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -225,6 +227,44 @@ class MvcIntegrationTest {
         mockMvc.perform(get("/api/posts/" + id + "/comments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void postLikeToMissingPostReturnsNotFoundTest() throws Exception {
+        mockMvc.perform(post("/api/posts/9999/likes")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void putImageToMissingPostReturnsNotFoundTest() throws Exception {
+        MockMultipartFile file =
+                new MockMultipartFile("image", "image.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[] {1, 2, 3});
+
+        mockMvc.perform(multipart(HttpMethod.PUT, "/api/posts/9999/image").file(file))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createCommentToMissingPostReturnsNotFoundTest() throws Exception {
+        mockMvc.perform(post("/api/posts/9999/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"text\":\"Комментарий\",\"postId\":9999}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createPostWithNullTagReturnsBadRequestTest() throws Exception {
+        mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Пост\",\"text\":\"Текст\",\"tags\":[null]}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createPostWithBlankTagReturnsBadRequestTest() throws Exception {
+        mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Пост\",\"text\":\"Текст\",\"tags\":[\"   \"]}"))
+                .andExpect(status().isBadRequest());
     }
 
     private long extractId(String json) {
