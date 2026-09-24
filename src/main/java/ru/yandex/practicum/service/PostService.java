@@ -10,7 +10,6 @@ import ru.yandex.practicum.dto.UpdatePostRequest;
  * Определяет бизнес-логику для управления постами блога.
  */
 public interface PostService {
-
     /**
      * Получить список постов с поиском и пагинацией.
      *

@@ -19,10 +19,13 @@ import ru.yandex.practicum.model.Post;
  * и Тема 4 «Создание бинов через Java-аннотации» (@Service).
  * Реализация п. 9 (проектирование слоёв: Service) и п. 15 (написание сервисов).
  * Улучшение: бизнес-логика конвертации тегов (String <-> List) вынесена в сервис.
+ *
+ * Спринт 4: Тема 7 «Автоконфигурации и стартеры» — @Service-бин
+ * регистрируется через компонентное сканирование Spring Boot.
+ * Реализация постановки спринта 4: слой сервисов переписан без изменений логики.
  */
 @Service
 public class PostServiceImpl implements PostService {
-
     private final PostDao postDao;
 
     /**
@@ -41,7 +44,6 @@ public class PostServiceImpl implements PostService {
         long totalPosts = postDao.countPosts(search);
         int lastPage = (int) Math.ceil((double) totalPosts / pageSize);
         if (lastPage == 0) lastPage = 1;
-
         PostListResponse response = new PostListResponse();
         response.setPosts(posts.stream().map(this::toListResponse).toList());
         response.setHasPrev(pageNumber > 1);

@@ -17,10 +17,13 @@ import ru.yandex.practicum.model.Comment;
  * Спринт 3: Тема 2 «Spring как IoC-контейнер» (DI через конструктор)
  * и Тема 4 «Создание бинов через Java-аннотации» (@Service).
  * Реализация п. 9 (проектирование слоёв: Service) и п. 15 (написание сервисов).
+ *
+ * Спринт 4: Тема 7 «Автоконфигурации и стартеры» — @Service-бин
+ * регистрируется через компонентное сканирование Spring Boot.
+ * Реализация постановки спринта 4: слой сервисов переписан без изменений логики.
  */
 @Service
 public class CommentServiceImpl implements CommentService {
-
     private final CommentDao commentDao;
     private final PostDao postDao;
 

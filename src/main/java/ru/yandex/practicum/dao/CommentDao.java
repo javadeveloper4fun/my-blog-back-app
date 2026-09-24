@@ -8,7 +8,6 @@ import ru.yandex.practicum.model.Comment;
  * Определяет CRUD-операции для комментариев к постам.
  */
 public interface CommentDao {
-
     /**
      * Получить все комментарии к посту.
      *

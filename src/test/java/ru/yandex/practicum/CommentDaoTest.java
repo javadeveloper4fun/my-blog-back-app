@@ -5,13 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.config.DataConfig;
 import ru.yandex.practicum.dao.CommentDao;
-import ru.yandex.practicum.dao.CommentDaoImpl;
 import ru.yandex.practicum.dao.PostDao;
-import ru.yandex.practicum.dao.PostDaoImpl;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Comment;
 import ru.yandex.practicum.model.Post;
@@ -19,14 +16,13 @@ import ru.yandex.practicum.model.Post;
 /**
  * Интеграционные тесты слоя DAO комментариев с реальной БД H2.
  *
- * Спринт 3: Тема 10 «TestContext Framework» (@SpringJUnitConfig + @Transactional)
- * и Тема 11 «Практика по тестированию Spring-приложений».
- * Реализация п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
+ * Спринт 4: Тема 10 «SpringBootTest для тестирования Spring Boot-приложений» —
+ * аннотация SpringBootTest даёт автоконфигурацию DataSource и JdbcTemplate.
+ * Реализация постановки спринта 4: тесты DAO переписаны на Spring Boot Test.
  */
-@SpringJUnitConfig(classes = {DataConfig.class, PostDaoImpl.class, CommentDaoImpl.class, IntegrationTestConfig.class})
+@SpringBootTest
 @Transactional
 class CommentDaoTest {
-
     @Autowired
     private PostDao postDao;
 
@@ -45,12 +41,11 @@ class CommentDaoTest {
     @Test
     void saveAndFindByIdTest() {
         long postId = createPost();
-
         Comment comment = new Comment();
         comment.setText("Первый комментарий");
         comment.setPostId(postId);
-        long commentId = commentDao.save(comment).getId();
 
+        long commentId = commentDao.save(comment).getId();
         Comment found = commentDao.findById(postId, commentId);
 
         assertEquals(commentId, found.getId());
@@ -61,7 +56,6 @@ class CommentDaoTest {
     @Test
     void findByPostIdReturnsAllCommentsInOrderTest() {
         long postId = createPost();
-
         Comment c1 = new Comment();
         c1.setText("Первый");
         c1.setPostId(postId);
@@ -73,7 +67,6 @@ class CommentDaoTest {
         long id2 = commentDao.save(c2).getId();
 
         List<Comment> comments = commentDao.findByPostId(postId);
-
         assertEquals(2, comments.size());
         assertEquals(id1, comments.get(0).getId());
         assertEquals(id2, comments.get(1).getId());
@@ -96,7 +89,6 @@ class CommentDaoTest {
     @Test
     void updateCommentTest() {
         long postId = createPost();
-
         Comment comment = new Comment();
         comment.setText("Старый текст");
         comment.setPostId(postId);
@@ -104,7 +96,6 @@ class CommentDaoTest {
 
         Comment found = commentDao.findById(postId, commentId);
         found.setText("Новый текст");
-
         commentDao.update(found);
 
         assertEquals("Новый текст", commentDao.findById(postId, commentId).getText());
@@ -132,14 +123,12 @@ class CommentDaoTest {
     @Test
     void deleteCommentTest() {
         long postId = createPost();
-
         Comment comment = new Comment();
         comment.setText("Удаляемый комментарий");
         comment.setPostId(postId);
         long commentId = commentDao.save(comment).getId();
 
         commentDao.deleteById(postId, commentId);
-
         assertThrows(NotFoundException.class, () -> commentDao.findById(postId, commentId));
         assertTrue(commentDao.findByPostId(postId).isEmpty());
     }
@@ -147,16 +136,13 @@ class CommentDaoTest {
     @Test
     void deletePostCascadesCommentsTest() {
         long postId = createPost();
-
         Comment comment = new Comment();
         comment.setText("Комментарий");
         comment.setPostId(postId);
         commentDao.save(comment);
 
         assertFalse(commentDao.findByPostId(postId).isEmpty());
-
         postDao.deleteById(postId);
-
         assertTrue(commentDao.findByPostId(postId).isEmpty());
     }
 

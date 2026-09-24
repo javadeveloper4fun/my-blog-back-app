@@ -27,11 +27,14 @@ import ru.yandex.practicum.service.CommentService;
  * - POST   /api/posts/{id}/comments                — добавление комментария
  * - PUT    /api/posts/{id}/comments/{commentId}    — редактирование комментария
  * - DELETE /api/posts/{id}/comments/{commentId}    — удаление комментария
+ *
+ * Спринт 4: Тема 2 «Spring Boot как развитие Spring Framework» (REST-контроллеры).
+ * Реализация постановки спринта 4: контроллер работает на автоконфигурированном
+ * Spring Boot Web без ручной Java-конфигурации MVC и web.xml.
  */
 @RestController
 @RequestMapping("/api/posts/{postId}/comments")
 public class CommentController {
-
     private final CommentService commentService;
 
     public CommentController(CommentService commentService) {

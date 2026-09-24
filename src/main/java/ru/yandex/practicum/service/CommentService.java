@@ -10,7 +10,6 @@ import ru.yandex.practicum.dto.UpdateCommentRequest;
  * Определяет бизнес-логику для управления комментариями к постам.
  */
 public interface CommentService {
-
     /**
      * Получить все комментарии к посту.
      *

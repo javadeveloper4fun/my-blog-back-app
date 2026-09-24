@@ -23,12 +23,16 @@ import ru.yandex.practicum.model.Post;
  * Используется JdbcTemplate — компонент Spring JDBC (Тема 8 практика).
  * Реализация п. 9 (проектирование слоёв: DAO) и п. 15 (написание DAO).
  * П. 14 (интеграция Spring с СУБД через JdbcTemplate).
+ *
+ * Спринт 4: Тема 7 «Автоконфигурации и стартеры» —
+ * JdbcTemplate автоконфигурируется Spring Boot Data JDBC
+ * (spring-boot-starter-data-jdbc), DataSource H2 — стартером Data JDBC.
+ * Реализация постановки спринта 4: ручная Java-конфигурация СУБД заменена
+ * автоконфигурацией Spring Boot, SQL-скрипт schema.sql выполняется при старте.
  */
 @Repository
 public class PostDaoImpl implements PostDao {
-
     private static final String INSERT_TAG_SQL = "INSERT INTO post_tags (post_id, tag) VALUES (?, ?)";
-
     private final JdbcTemplate jdbcTemplate;
 
     public PostDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -53,7 +57,6 @@ public class PostDaoImpl implements PostDao {
                 + "FROM posts p"
                 + whereClause + " ORDER BY p.id DESC LIMIT ? OFFSET ?";
         Object[] params = buildQueryParams(search, pageSize, (pageNumber - 1) * pageSize);
-
         List<Post> posts = jdbcTemplate.query(sql, postRowMapper, params);
         attachTags(posts);
         return posts;

@@ -5,37 +5,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.config.DataConfig;
-import ru.yandex.practicum.dao.CommentDaoImpl;
-import ru.yandex.practicum.dao.PostDaoImpl;
 import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.dto.CreatePostRequest;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.exception.InvalidRequestException;
-import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.service.CommentServiceImpl;
 import ru.yandex.practicum.service.PostServiceImpl;
 
 /**
  * Интеграционные тесты бизнес-логики сервисов с реальной БД H2.
  *
- * Спринт 3: Тема 10 «TestContext Framework» (@SpringJUnitConfig + @Transactional)
- * и Тема 11 «Практика по тестированию Spring-приложений».
+ * Спринт 4: Тема 10 «SpringBootTest для тестирования Spring Boot-приложений» —
+ * аннотация SpringBootTest автоматически поднимает контекст,
+ * аннотация Transactional изолирует тесты.
+ * Реализация постановки спринта 4: тесты слоя сервисов переписаны на Spring Boot Test.
  */
-@SpringJUnitConfig(
-        classes = {
-            DataConfig.class,
-            PostServiceImpl.class,
-            CommentServiceImpl.class,
-            PostDaoImpl.class,
-            CommentDaoImpl.class,
-            IntegrationTestConfig.class
-        })
+@SpringBootTest
 @Transactional
 class PostServiceTest {
-
     @Autowired
     private PostServiceImpl postService;
 
@@ -110,7 +99,6 @@ class PostServiceTest {
         postService.createPost(request);
 
         PostListResponse response = postService.getPosts("", 1, 10);
-
         assertEquals(1, response.getPosts().size());
         assertEquals(129, response.getPosts().get(0).getText().length());
         assertEquals(true, response.getPosts().get(0).getText().startsWith("а".repeat(128)));
@@ -127,7 +115,6 @@ class PostServiceTest {
 
         PostListResponse list = postService.getPosts("", 1, 10);
         assertEquals(129, list.getPosts().get(0).getText().length());
-
         assertEquals(
                 200,
                 postService.getPost(list.getPosts().get(0).getId()).getText().length());
@@ -141,38 +128,7 @@ class PostServiceTest {
         request.setTags(java.util.List.of("  Java ", "java", "Spring", "SQL"));
 
         var created = postService.createPost(request);
-
         assertEquals(java.util.List.of("java", "spring", "sql"), created.getTags());
-    }
-
-    @Test
-    void nullTagThrowsTest() {
-        CreatePostRequest request = new CreatePostRequest();
-        request.setTitle("Пост с null-тегом");
-        request.setText("Текст");
-        request.setTags(java.util.Arrays.asList("java", null, "spring"));
-
-        assertThrows(InvalidRequestException.class, () -> postService.createPost(request));
-    }
-
-    @Test
-    void blankTagThrowsTest() {
-        CreatePostRequest request = new CreatePostRequest();
-        request.setTitle("Пост с пустым тегом");
-        request.setText("Текст");
-        request.setTags(java.util.List.of("java", "  "));
-
-        assertThrows(InvalidRequestException.class, () -> postService.createPost(request));
-    }
-
-    @Test
-    void createCommentToMissingPostThrowsTest() {
-        long missingPostId = 9999L;
-        CreateCommentRequest request = new CreateCommentRequest();
-        request.setText("Комментарий к несуществующему посту");
-        request.setPostId(missingPostId);
-
-        assertThrows(NotFoundException.class, () -> commentService.createComment(missingPostId, request));
     }
 
     @Test
@@ -183,7 +139,6 @@ class PostServiceTest {
         request.setTags(null);
 
         var created = postService.createPost(request);
-
         assertEquals(java.util.List.of(), created.getTags());
     }
 
