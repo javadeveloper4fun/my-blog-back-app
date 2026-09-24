@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +29,12 @@ import ru.yandex.practicum.service.PostService;
  * Спринт 3: Тема 9 «Модульное и интеграционное тестирование в Spring»
  * (JUnit 5 + Mockito + MockMvc standalone).
  * Реализация п. 17 (интеграционные тесты на MVC с WebMvc).
+ *
+ * Спринт 4: unit-тест контроллера с MockMvc standalone сохранён из спринта 3;
+ * интеграционные сценарии MVC покрыты MvcIntegrationTest (@SpringBootTest).
  */
 @ExtendWith(MockitoExtension.class)
 class PostControllerTest {
-
     private MockMvc mockMvc;
     private PostService postService;
     private final ObjectMapper objectMapper = new ObjectMapper();

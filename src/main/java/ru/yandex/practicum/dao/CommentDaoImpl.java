@@ -19,10 +19,15 @@ import ru.yandex.practicum.model.Comment;
  * и Тема 4 «Создание бинов через Java-аннотации» (@Repository).
  * Используется JdbcTemplate — компонент Spring JDBC (Тема 8 практика).
  * Реализация п. 9 (проектирование слоёв: DAO) и п. 15 (написание DAO).
+ *
+ * Спринт 4: Тема 7 «Автоконфигурации и стартеры» —
+ * JdbcTemplate автоконфигурируется Spring Boot Data JDBC
+ * (spring-boot-starter-data-jdbc), DataSource H2 — стартером Data JDBC.
+ * Реализация постановки спринта 4: ручная Java-конфигурация СУБД заменена
+ * автоконфигурацией Spring Boot.
  */
 @Repository
 public class CommentDaoImpl implements CommentDao {
-
     private final JdbcTemplate jdbcTemplate;
 
     public CommentDaoImpl(JdbcTemplate jdbcTemplate) {

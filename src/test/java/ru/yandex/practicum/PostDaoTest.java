@@ -5,13 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.config.DataConfig;
 import ru.yandex.practicum.dao.CommentDao;
-import ru.yandex.practicum.dao.CommentDaoImpl;
 import ru.yandex.practicum.dao.PostDao;
-import ru.yandex.practicum.dao.PostDaoImpl;
 import ru.yandex.practicum.exception.NotFoundException;
 import ru.yandex.practicum.model.Comment;
 import ru.yandex.practicum.model.Post;
@@ -20,14 +17,13 @@ import ru.yandex.practicum.model.Post;
  * Интеграционные тесты слоя DAO постов с реальной БД H2.
  * Проверяют корректность SQL-запросов, поиска, пагинации и подсчёта комментариев.
  *
- * Спринт 3: Тема 10 «TestContext Framework» (@SpringJUnitConfig + @Transactional)
- * и Тема 11 «Практика по тестированию Spring-приложений».
- * Реализация п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
+ * Спринт 4: Тема 10 «SpringBootTest для тестирования Spring Boot-приложений» —
+ * аннотация SpringBootTest даёт автоконфигурацию H2 и JdbcTemplate.
+ * Реализация постановки спринта 4: тесты DAO переписаны на Spring Boot Test.
  */
-@SpringJUnitConfig(classes = {DataConfig.class, PostDaoImpl.class, CommentDaoImpl.class, IntegrationTestConfig.class})
+@SpringBootTest
 @Transactional
 class PostDaoTest {
-
     @Autowired
     private PostDao postDao;
 
@@ -46,7 +42,6 @@ class PostDaoTest {
     @Test
     void saveAndFindByIdTest() {
         long id = createPost("Первый пост", "Текст первого поста", List.of("java", "spring"));
-
         Post found = postDao.findById(id);
 
         assertEquals(id, found.getId());
@@ -60,7 +55,6 @@ class PostDaoTest {
     @Test
     void findAllEmptyListTest() {
         List<Post> posts = postDao.findAll("", 1, 10);
-
         assertNotNull(posts);
         assertTrue(posts.isEmpty());
         assertEquals(0L, postDao.countPosts(""));
@@ -86,7 +80,6 @@ class PostDaoTest {
         long second = createPost("Поздний пост", "Текст", List.of());
 
         List<Post> posts = postDao.findAll("", 1, 10);
-
         assertEquals(second, posts.get(0).getId());
         assertEquals(first, posts.get(1).getId());
     }
@@ -98,7 +91,6 @@ class PostDaoTest {
         createPost("Кофе с молоком", "Рецепт", List.of());
 
         List<Post> posts = postDao.findAll("Кофе", 1, 10);
-
         assertEquals(2, posts.size());
         assertEquals(2L, postDao.countPosts("Кофе"));
         assertTrue(posts.stream().anyMatch(p -> p.getTitle().equals("Как варить Кофе")));
@@ -111,7 +103,6 @@ class PostDaoTest {
         createPost("Пост по весне", "Текст", List.of("spring"));
 
         List<Post> posts = postDao.findAll("#java", 1, 10);
-
         assertEquals(1, posts.size());
         assertEquals("Пост по java", posts.get(0).getTitle());
     }
@@ -121,7 +112,6 @@ class PostDaoTest {
         createPost("Пост по java", "Текст", List.of("JAVA", "backend"));
 
         List<Post> posts = postDao.findAll("#Java", 1, 10);
-
         assertEquals(1, posts.size());
         assertEquals("Пост по java", posts.get(0).getTitle());
     }
@@ -132,7 +122,6 @@ class PostDaoTest {
         createPost("Пост про java core", "Текст", List.of("java"));
 
         List<Post> posts = postDao.findAll("#java", 1, 10);
-
         assertEquals(1, posts.size());
         assertEquals("Пост про java core", posts.get(0).getTitle());
     }
@@ -144,7 +133,6 @@ class PostDaoTest {
         createPost("Другой урок", "Текст", List.of("spring"));
 
         List<Post> posts = postDao.findAll("Урок #java", 1, 10);
-
         assertEquals(2, posts.size());
     }
 
@@ -154,7 +142,6 @@ class PostDaoTest {
         createPost("Пост с длинным текстом", longText, List.of());
 
         List<Post> posts = postDao.findAll("", 1, 10);
-
         assertEquals(1, posts.size());
         assertEquals(200, posts.get(0).getText().length());
     }
@@ -162,14 +149,12 @@ class PostDaoTest {
     @Test
     void updatePostTest() {
         long id = createPost("Старое название", "Старый текст", List.of("java"));
-
         Post post = postDao.findById(id);
         post.setTitle("Новое название");
         post.setText("Новый текст");
         post.setTags(List.of("spring", "web"));
 
         Post updated = postDao.update(post);
-
         assertEquals("Новое название", updated.getTitle());
         assertEquals("Новый текст", updated.getText());
         assertEquals(List.of("spring", "web"), updated.getTags());
@@ -178,16 +163,13 @@ class PostDaoTest {
     @Test
     void deleteByIdTest() {
         long id = createPost("Пост на удаление", "Текст", List.of());
-
         postDao.deleteById(id);
-
         assertThrows(NotFoundException.class, () -> postDao.findById(id));
     }
 
     @Test
     void incrementLikesTest() {
         long id = createPost("Пост с лайком", "Текст", List.of());
-
         assertEquals(1L, postDao.incrementLikes(id));
         assertEquals(2L, postDao.incrementLikes(id));
         assertEquals(2L, postDao.findById(id).getLikesCount());
@@ -196,7 +178,6 @@ class PostDaoTest {
     @Test
     void commentsCountInListTest() {
         long id = createPost("Пост", "Текст", List.of());
-
         Comment c1 = new Comment();
         c1.setText("Первый");
         c1.setPostId(id);
@@ -219,9 +200,7 @@ class PostDaoTest {
     void updateImageAndGetImageTest() {
         long id = createPost("Пост с картинкой", "Текст", List.of());
         byte[] image = new byte[] {1, 2, 3, 4};
-
         postDao.updateImage(id, image);
-
         assertArrayEquals(image, postDao.getImage(id));
     }
 

@@ -34,11 +34,14 @@ import ru.yandex.practicum.service.PostService;
  * - POST /api/posts/{id}/likes   — инкремент лайков
  * - PUT  /api/posts/{id}/image   — обновление картинки
  * - GET  /api/posts/{id}/image   — получение картинки
+ *
+ * Спринт 4: Тема 2 «Spring Boot как развитие Spring Framework» (REST-контроллеры).
+ * Реализация постановки спринта 4: контроллер работает на автоконфигурированном
+ * Spring Boot Web без ручной Java-конфигурации MVC и web.xml.
  */
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
-
     private final PostService postService;
 
     public PostController(PostService postService) {

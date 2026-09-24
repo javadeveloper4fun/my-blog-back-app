@@ -5,11 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.config.DataConfig;
-import ru.yandex.practicum.dao.CommentDaoImpl;
-import ru.yandex.practicum.dao.PostDaoImpl;
 import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.dto.CreateCommentRequest;
 import ru.yandex.practicum.dto.CreatePostRequest;
@@ -23,23 +20,13 @@ import ru.yandex.practicum.service.PostServiceImpl;
  * Интеграционные тесты сервисов и DAO.
  * Проверяют корректность работы бизнес-логики с реальной БД H2.
  *
- * Спринт 3: Тема 10 «TestContext Framework» (@SpringJUnitConfig + @Transactional)
- * и Тема 11 «Практика по тестированию Spring-приложений».
- * Реализация п. 16 (тесты на слой сервисов с Spring Test Framework)
- * и п. 17 (интеграционные тесты на DAO с Embedded In-Memory H2).
+ * Спринт 4: Тема 10 «SpringBootTest для тестирования Spring Boot-приложений» —
+ * аннотация SpringBootTest вместо ручной сборки контекста Spring Test (спринт 3).
+ * Реализация постановки спринта 4: тесты слоя сервисов переписаны на Spring Boot Test.
  */
-@SpringJUnitConfig(
-        classes = {
-            DataConfig.class,
-            PostServiceImpl.class,
-            CommentServiceImpl.class,
-            PostDaoImpl.class,
-            CommentDaoImpl.class,
-            IntegrationTestConfig.class
-        })
+@SpringBootTest
 @Transactional
 class ApplicationTests {
-
     @Autowired
     private PostServiceImpl postService;
 
@@ -79,7 +66,6 @@ class ApplicationTests {
         long id = created.getId();
 
         postService.deletePost(id);
-
         assertThrows(NotFoundException.class, () -> postService.getPost(id));
     }
 
@@ -116,7 +102,6 @@ class ApplicationTests {
 
         CommentResponse found = commentService.getComment(postId, created.getId());
         assertEquals("Первый комментарий", found.getText());
-
         assertEquals(1, commentService.getCommentsByPostId(postId).size());
 
         UpdateCommentRequest updateRequest = new UpdateCommentRequest();

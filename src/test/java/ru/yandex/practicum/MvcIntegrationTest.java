@@ -4,46 +4,36 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
-import ru.yandex.practicum.config.DataConfig;
-import ru.yandex.practicum.config.WebConfig;
 
 /**
- * Интеграционные тесты MVC с полным контекстом Spring (WebConfig + DataConfig)
+ * Интеграционные тесты MVC с полным контекстом Spring Boot
  * и встроенной БД H2.
- * Поднимают реальные контроллеры, сервисы и DAO через MockMvcBuilders.webAppContextSetup.
+ * Поднимают реальные контроллеры, сервисы и DAO через автоконфигурированный MockMvc.
  *
- * Спринт 3: Тема 9 «Модульное и интеграционное тестирование в Spring» (MockMvc)
- * и Тема 10 «TestContext Framework» (@SpringJUnitWebConfig + @Transactional).
- * Реализация п. 17 (интеграционные тесты на MVC с WebMvc и Embedded H2).
+ * Спринт 4: Тема 10 «SpringBootTest для тестирования Spring Boot-приложений»
+ * и Тема 11 «Практика по тестированию Spring Boot-приложения».
+ * Аннотации SpringBootTest и AutoConfigureMockMvc вместо ручной сборки
+ * MockMvc (спринт 3); за счёт одного ApplicationContext Spring переиспользует
+ * кешированный контекст между тестовыми классами (кеширование контекстов).
  */
-@SpringJUnitWebConfig(classes = {WebConfig.class, DataConfig.class, IntegrationTestConfig.class})
+@SpringBootTest
+@AutoConfigureMockMvc
 @Transactional
 class MvcIntegrationTest {
-
     @Autowired
-    private WebApplicationContext context;
-
     private MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-    }
 
     @Test
     void createPostViaControllerTest() throws Exception {
         String request = """
                 {"title":"Интеграционный пост","text":"Текст поста","tags":["java","spring"]}""";
-
         mockMvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
@@ -91,7 +81,6 @@ class MvcIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-
         long id = extractId(body);
 
         mockMvc.perform(post("/api/posts/" + id + "/likes")).andExpect(status().isOk());
@@ -220,7 +209,6 @@ class MvcIntegrationTest {
         mockMvc.perform(post("/api/posts/" + id + "/likes")).andExpect(status().isOk());
 
         mockMvc.perform(delete("/api/posts/" + id)).andExpect(status().isOk());
-
         mockMvc.perform(post("/api/posts/" + id)).andExpect(status().isNotFound());
         mockMvc.perform(get("/api/posts/" + id + "/comments"))
                 .andExpect(status().isOk())

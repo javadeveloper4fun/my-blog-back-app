@@ -16,10 +16,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * Улучшение: обработка ошибок (400, 404, 500) не требуется по постановке,
  * но реализована для корректной работы с фронтендом.
  * 400 — обязательные поля по постановке («все поля обязательные»).
+ *
+ * Спринт 4: Тема 7 «Автоконфигурации и стартеры» — обработчик-совет
+ * RestControllerAdvice поднимается автоконфигурацией Spring Boot Web
+ * без регистрации вручную.
+ * Реализация постановки спринта 4: код обработчика перенесён без изменений.
  */
 @RestControllerAdvice
 public class ExceptionController {
-
     private static final System.Logger LOGGER = System.getLogger(ExceptionController.class.getName());
 
     @ExceptionHandler(NotFoundException.class)
